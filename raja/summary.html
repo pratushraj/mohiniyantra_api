@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Summary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body style="background-color: var(--card-bg);">
+    <div class="report-header">
+        <span style="font-size: 14px;">2101400016</span>
+        <h2 style="margin: 0; flex: 1; text-align: center;">Purchase Summary From 28-01-2026 To 28-01-2026</h2>
+        <button class="action-btn btn-red" style="min-width: 80px;" onclick="history.back()">Close</button>
+    </div>
+
+    <div class="report-filters" style="justify-content: space-between; padding: 5px 20px;">
+        <div>
+            <span>28-01-2026</span><br>
+            <span>9:10</span>
+        </div>
+        <div style="font-size: 24px; font-weight: bold;">Opening Points 97676.90</div>
+    </div>
+
+    <div class="container fade-in" style="padding: 0;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Purchase Points</th>
+                    <th>Gift Points</th>
+                    <th>Net Points</th>
+                    <th>Balance Point</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>28-1-2026</td>
+                    <td>2591.60</td>
+                    <td>2800.00</td>
+                    <td>-208.40</td>
+                    <td>97885.30</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="text-align: right; font-size: 24px; font-weight: bold; padding: 10px 20px;">
+            Closing Points 97885.30
+        </div>
+    </div>
+</body>
+
+</html>

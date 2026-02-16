@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Dhankeshri Play - Home</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            document.title = `${appGlobalConfig.appName} - Home`;
+            const infoDiv = document.querySelector('.top-bar');
+            if (infoDiv) {
+                infoDiv.innerHTML = `
+                    <div class="top-info">
+                        <span>Welcome : ${appGlobalConfig.unique_id}</span>
+                        <span>Balance Point : ${appGlobalConfig.balance}</span>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div class="top-bar">
+        <span>0.0.16</span>
+    </div>
+
+    <div class="home-screen fade-in">
+        <button class="nav-main-btn" onclick="location.href='bulk-coupons.html'">Navratna</button>
+
+        <div class="bottom-nav">
+            <button class="action-btn btn-red" onclick="location.href='change-password.html'">Change Password</button>
+            <button class="action-btn btn-red" style="padding: 15px 40px; font-size: 20px;"
+                onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Placeholder for any shared logic
+    </script>
+</body>
+
+</html>

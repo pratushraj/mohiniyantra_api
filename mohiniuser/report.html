@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Details Report</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+</head>
+
+<body style="background-color: var(--card-bg);">
+    <div class="report-header" style="display: flex;">
+        <h2 style="margin: 0; flex: 1; text-align: center;">Coupon Details Report</h2>
+        <button class="action-btn btn-red" style="min-width: 80px;" onclick="history.back()">Close</button>
+    </div>
+
+    <div class="report-filters">
+        <label>Select Date :</label>
+        <input type="date" id="targetDate" style="width: 150px; padding: 5px;">
+        <label>From Time:</label>
+        <select id="fromHH">
+            <option value="00">00</option>
+        </select>
+        <select id="fromMM">
+            <option value="00">00</option>
+        </select>
+        <label>To Time:</label>
+        <select id="toHH">
+            <option value="00">00</option>
+        </select>
+        <select id="toMM">
+            <option value="00">00</option>
+        </select>
+        <button class="action-btn btn-blue" id="submitBtn" style="background:#4b6584; min-width: 80px;">Submit</button>
+    </div>
+
+    <div class="container fade-in" style="padding: 0;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Sr.No</th>
+                    <th style="width: 30%;">GiftEventCode</th>
+                    <th style="width: 30%;">Selected</th>
+                    <th style="width: 30%;">Qty</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                <!-- Data populated via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate Time Dropdowns
+            const hhs = document.querySelectorAll('#fromHH, #toHH');
+            const mms = document.querySelectorAll('#fromMM, #toMM');
+
+            hhs.forEach(sel => {
+                sel.innerHTML = '';
+                for (let i = 0; i < 24; i++) {
+                    const h = String(i).padStart(2, '0');
+                    sel.innerHTML += `<option value="${h}">${h}</option>`;
+                }
+            });
+            mms.forEach(sel => {
+                sel.innerHTML = '';
+                for (let i = 0; i < 60; i++) {
+                    const m = String(i).padStart(2, '0');
+                    sel.innerHTML += `<option value="${m}">${m}</option>`;
+                }
+            });
+
+            // Set today's date in YYYY-MM-DD for the date input
+            const dateInput = document.getElementById('targetDate');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+
+            document.getElementById('submitBtn').addEventListener('click', fetchReport);
+            fetchReport(); // Initial load
+        });
+
+        async function fetchReport() {
+            const dateVal = document.getElementById('targetDate').value;
+            if (!dateVal) {
+                showPopup("Please select a date", "Warning");
+                return;
+            }
+
+            // Convert YYYY-MM-DD input to configured format (e.g., d-m-Y) for API
+            const dateParts = dateVal.split('-');
+            const dObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+            const apiDate = formatDate(dObj);
+
+            // Get Time Filters
+            const fromHH = document.getElementById('fromHH').value;
+            const fromMM = document.getElementById('fromMM').value;
+            const toHH = document.getElementById('toHH').value;
+            const toMM = document.getElementById('toMM').value;
+
+            const fromTime = `${fromHH}:${fromMM}`;
+            const toTime = `${toHH}:${toMM}`;
+            // If 00:00 to 00:00, show all
+            const isNoTimeFilter = (fromTime === '00:00' && toTime === '00:00');
+
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+
+            try {
+                const response = await fetch(CONFIG.TICKET_DETAILS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: appGlobalConfig.userId,
+                        date: apiDate
+                    })
+                });
+
+                const json = await response.json();
+                tbody.innerHTML = '';
+
+                if (json.status && json.data) {
+                    let globalIdx = 1;
+                    let hasShownAny = false;
+
+                    json.data.forEach(purchase => {
+                        purchase.events.forEach(event => {
+                            // Filter by time range
+                            const drawTime = event.draw_time; // e.g., "09:30"
+                            const isVisible = isNoTimeFilter || (drawTime >= fromTime && drawTime <= toTime);
+
+                            if (isVisible) {
+                                hasShownAny = true;
+
+                                let eventTotalPoints = 0;
+                                let eventShown = false;
+
+                                event.numberselected.forEach(group => {
+                                    group.selectednumbers.forEach(ticket => {
+                                        const tr = document.createElement('tr');
+
+                                        let selectedDisplay = "";
+                                        if (ticket.number.includes('-')) {
+                                            const parts = ticket.number.split('-');
+                                            selectedDisplay = `${group.game_type_code}${parts[0]} - ${group.game_type_code}${parts[1]}`;
+                                        } else {
+                                            selectedDisplay = `${group.game_type_code}${ticket.number}`;
+                                        }
+
+                                        eventTotalPoints += parseFloat(ticket.amount);
+
+                                        if (!eventShown) {
+                                            tr.innerHTML = `
+                                                <td>${globalIdx++}</td>
+                                                <td>${event.gifteventcode}</td>
+                                                <td>${selectedDisplay}</td>
+                                                <td>${ticket.qty}</td>
+                                            `;
+                                            eventShown = true;
+                                        } else {
+                                            tr.innerHTML = `
+                                                <td></td>
+                                                <td></td>
+                                                <td>${selectedDisplay}</td>
+                                                <td>${ticket.qty}</td>
+                                            `;
+                                        }
+                                        tbody.appendChild(tr);
+                                    });
+                                });
+
+                                // 2. Render Summary Rows
+                                // Total Points Row
+                                const totalTr = document.createElement('tr');
+                                totalTr.style.backgroundColor = "var(--header-bg)";
+                                totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points: ${eventTotalPoints.toFixed(3)}</td>`;
+                                tbody.appendChild(totalTr);
+
+                                // Gift Points Row
+                                const giftPtsTr = document.createElement('tr');
+                                giftPtsTr.style.backgroundColor = "var(--header-bg)";
+                                giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are 0</td>`;
+                                tbody.appendChild(giftPtsTr);
+
+                                // Gift Code Row
+                                const giftCodeTr = document.createElement('tr');
+                                giftCodeTr.style.backgroundColor = "var(--header-bg)";
+                                giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: --</td>`;
+                                tbody.appendChild(giftCodeTr);
+                            }
+                        });
+                    });
+
+                    if (!hasShownAny) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No records found for the selected time range.</td></tr>`;
+                    }
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">${json.msg || 'No data found'}</td></tr>`;
+                }
+
+                // Empty rows for design
+                const rowsNeeded = 15 - tbody.children.length;
+                for (let i = 0; i < rowsNeeded; i++) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = '<td>&nbsp;</td><td></td><td></td><td></td>';
+                    tbody.appendChild(tr);
+                }
+
+            } catch (error) {
+                console.error("Report Fetch Error:", error);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading report</td></tr>';
+            }
+        }
+    </script>
+</body>
+
+</html>

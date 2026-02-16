@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Summary</title>
+    <script src="config.js"></script>
+    <style>
+        body {
+            background-color: #f1eeab;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #000;
+        }
+
+        .header-section {
+            background-color: #c5a02c;
+            padding: 5px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+        }
+
+        .header-left {
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .header-center {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+            border: 2px solid #333;
+            padding: 2px 20px;
+            font-size: 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .sub-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 15px;
+            font-size: 24px;
+            border-bottom: 2px solid #333;
+        }
+
+        .table-container {
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 4px 8px;
+            font-size: 22px;
+        }
+
+        th {
+            border-top: none;
+            font-weight: normal;
+        }
+
+        .closing-row {
+            display: flex;
+            justify-content: flex-end;
+            padding: 5px 15px;
+            font-size: 24px;
+            gap: 20px;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+        }
+
+        .val-col {
+            min-width: 100px;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-section">
+        <div class="header-left">
+            <div>0.0.16</div>
+            <div id="user-id-display">---</div>
+        </div>
+        <div class="header-center" id="summary-title">
+            Purchase Summary From -- To --
+        </div>
+        <button class="close-btn" onclick="location.href='index.html'">Close</button>
+    </div>
+
+    <div class="sub-header">
+        <div id="curr-datetime">--<br>--</div>
+        <div style="display: flex; gap: 40px;">
+            <span>Opening Points</span>
+            <span id="opening_points" style="min-width: 120px; text-align: right;">0.00</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Purchase Points</th>
+                    <th>Gift Points</th>
+                    <th>Net Points</th>
+                    <th>Balance Point</th>
+                </tr>
+            </thead>
+            <tbody id="pur-fill-opp">
+                <!-- Data populated via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="closing-row">
+        <span>Closing Points</span>
+        <span id="closing_points" style="min-width: 150px; text-align: right;">0.00</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // console.log(appGlobalConfig);
+            const userId = appGlobalConfig.unique_id || '---';
+            document.getElementById('user-id-display').textContent = userId;
+
+            // Date and Time for Sub-header
+            const now = new Date();
+            const dtStr = formatDate(now);
+            const tmStr = String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('curr-datetime').innerHTML = `${dtStr}<br>${tmStr}`;
+
+            // Fetch summary data
+            try {
+                const formattedDate = formatDate(now);
+
+                const response = await fetch(CONFIG.PURCHASE_SUMMARY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: appGlobalConfig.userId,
+                        from_date: formattedDate,
+                        to_date: formattedDate
+                    })
+                });
+
+                const json = await response.json();
+
+                if (json.status && json.data && json.data.length > 0) {
+                    const data = json.data;
+                    const tableBody = document.getElementById('pur-fill-opp');
+                    tableBody.innerHTML = '';
+
+                    document.getElementById('summary-title').textContent = `Purchase Summary From ${formatDate(data[0].date)} To ${formatDate(data[data.length - 1].date)}`;
+                    document.getElementById('opening_points').textContent = data[0].opening_balance || "0.00";
+                    document.getElementById('closing_points').textContent = data[data.length - 1].balance_pts || "0.00";
+
+                    data.forEach(obj => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${formatDate(obj.date)}</td>
+                            <td style="text-align: right;">${parseFloat(obj.purchase_pts).toFixed(2)}</td>
+                            <td style="text-align: right;">${parseFloat(obj.gift_pts).toFixed(2)}</td>
+                            <td style="text-align: right;">${parseFloat(obj.net_pts).toFixed(2)}</td>
+                            <td style="text-align: right;">${parseFloat(obj.balance_pts).toFixed(2)}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                } else {
+                    document.getElementById('pur-fill-opp').innerHTML = `<tr><td colspan="5" style="text-align:center;">No records.</td></tr>`;
+                }
+            } catch (error) {
+                console.error("Load Error:", error);
+            }
+        });
+    </script>
+</body>
+
+</html>

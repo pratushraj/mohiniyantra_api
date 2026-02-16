@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Details Report</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body style="background-color: var(--card-bg);">
+    <div class="report-header">
+        <h2 style="margin: 0; flex: 1; text-align: center;">Coupon Details Report</h2>
+        <button class="action-btn btn-red" style="min-width: 80px;" onclick="history.back()">Close</button>
+    </div>
+
+    <div class="report-filters">
+        <label>Select Date :</label>
+        <input type="text" value="28-01-2026" style="width: 120px;">
+        <label>From Time:</label>
+        <select>
+            <option>00</option>
+        </select>
+        <select>
+            <option>00</option>
+        </select>
+        <label>To Time:</label>
+        <select>
+            <option>00</option>
+        </select>
+        <select>
+            <option>00</option>
+        </select>
+        <button class="action-btn btn-blue" style="background:#4b6584; min-width: 80px;">Submit</button>
+    </div>
+
+    <div class="container fade-in" style="padding: 0;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Sr.No</th>
+                    <th style="width: 25%;">GiftEventCode</th>
+                    <th style="width: 25%;">Selected</th>
+                    <th style="width: 25%;">Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>28-01-2026 09:30</td>
+                    <td>RR00</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR01</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR02</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR03</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR04</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR05</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR06</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR07</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR08</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>RR09</td>
+                    <td>1</td>
+                </tr>
+                <!-- Multiple empty rows to match screenshot -->
+                <script>
+                    for (let i = 0; i < 10; i++) document.write('<tr><td>&nbsp;</td><td></td><td></td><td></td></tr>');
+                </script>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

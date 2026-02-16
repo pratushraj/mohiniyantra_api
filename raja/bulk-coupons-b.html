@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Dhankeshri Play - Bulk Coupons B</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            document.title = `${appGlobalConfig.appName} - Bulk Coupons B`;
+            const userSpan = document.querySelector('.top-info span:first-child');
+            const balanceSpan = document.querySelector('.top-info span:last-child');
+            if (userSpan) userSpan.textContent = `Welcome : ${appGlobalConfig.userName}`;
+            if (balanceSpan) balanceSpan.textContent = `Balance Point : ${appGlobalConfig.balance}`;
+        });
+    </script>
+</head>
+
+<body>
+    <div class="top-bar">
+        <div class="top-info">
+            <span>Welcome : 2101400016</span>
+            <span>Balance Point : 97885.30</span>
+        </div>
+        <div class="top-info" style="text-align: right;">
+            <span>Date : 28:01:2026</span><br>
+            <span>Gift Event Code : 09:30</span><br>
+            <span>Countdown : 00:00:58</span>
+        </div>
+        <button class="lobby-btn" onclick="location.href='index.html'">LOBBY [Q]</button>
+    </div>
+
+    <div class="container fade-in">
+        <div class="menu-tabs">
+            <button class="tab tab-bulk-a" onclick="location.href='bulk-coupons.html'">Bulk Coupons [ A ]</button>
+            <button class="tab tab-bulk-b active" onclick="location.href='bulk-coupons-b.html'">Bulk Coupons [ B
+                ]</button>
+            <button class="tab tab-pointwise">Pointwise Coupons</button>
+            <button class="tab tab-loose" onclick="location.href='loose-coupons.html'">Loose Coupons</button>
+            <button class="tab tab-loose-pointwise">Loose Pointwise Coupons</button>
+        </div>
+
+        <div style="display: none;">
+            <input type="hidden" id="pointRate" value="1.10">
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Product Group</th>
+                        <th>Gift Coin</th>
+                        <th>00-90</th>
+                        <th>01-91</th>
+                        <th>02-92</th>
+                        <th>03-93</th>
+                        <th>04-94</th>
+                        <th>05-95</th>
+                        <th>06-96</th>
+                        <th>07-97</th>
+                        <th>08-98</th>
+                        <th>09-99</th>
+                        <th>All</th>
+                        <th>Qty</th>
+                        <th>Pts</th>
+                        <th id="draw-time-header">--:--</th>
+                    </tr>
+                </thead>
+                <tbody id="couponBody">
+                    <!-- Dynamic rows will be here -->
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: var(--header-bg); font-weight: bold;">
+                        <td>All</td>
+                        <td>-</td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="0" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="1" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="2" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="3" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="4" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="5" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="6" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="7" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="8" inputmode="numeric">
+                        </td>
+                        <td><input type="text" class="input-cell global-range-input" data-col="9" inputmode="numeric">
+                        </td>
+                        <td style="text-align: right;">TOTAL</td>
+                        <td id="totalQty">0</td>
+                        <td id="totalPts">0.00</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="bottom-actions">
+            <button class="action-btn btn-green">UPCOMMING [F1]</button>
+            <button class="action-btn btn-green">SUBMIT [F2]</button>
+            <button class="action-btn btn-red" onclick="clearAll()">CLEAR [F3]</button>
+            <button class="action-btn btn-dark-red">CANCEL [F4]</button>
+            <button class="action-btn btn-dark-red">YANTRA [F5]</button>
+            <button class="action-btn btn-dark-red" onclick="location.href='report.html'">C. DETAILS [F6]</button>
+            <button class="action-btn btn-dark-red" onclick="location.href='summary.html'">P. SUM [F7]</button>
+        </div>
+    </div>
+
+    <script>
+        const appConfig = {
+            drawTime: '09:15',
+            groups: SHARED_GROUPS
+        };
+
+        const couponBody = document.getElementById('couponBody');
+        const drawTimeHeader = document.getElementById('draw-time-header');
+
+        function initUI() {
+            drawTimeHeader.textContent = appConfig.drawTime;
+            couponBody.innerHTML = '';
+
+            appConfig.groups.forEach(group => {
+                const tr = document.createElement('tr');
+                tr.className = 'coupon-row';
+
+                let html = `<td>${group.name}</td><td>-</td>`;
+                for (let i = 0; i < 10; i++) {
+                    html += `<td><input type="text" class="input-cell range-input" inputmode="numeric"></td>`;
+                }
+                html += `
+                    <td><input type="text" class="input-cell all-input" style="width: 50px;" inputmode="numeric"></td>
+                    <td class="qty-cell">0</td>
+                    <td class="pts-cell">0.00</td>
+                    <td style="font-weight: bold; font-size: 18px;">${group.code}</td>
+                `;
+                tr.innerHTML = html;
+                couponBody.appendChild(tr);
+            });
+        }
+
+        initUI();
+
+        const pointRateInput = document.getElementById('pointRate');
+        const totalQtyEl = document.getElementById('totalQty');
+        const totalPtsEl = document.getElementById('totalPts');
+
+        function calculate() {
+            let grandQty = 0;
+            let grandPts = 0;
+            const rate = parseFloat(pointRateInput.value) || 0;
+            const rows = document.querySelectorAll('.coupon-row');
+
+            rows.forEach(row => {
+                const rangeInputs = row.querySelectorAll('.range-input');
+                const qtyCell = row.querySelector('.qty-cell');
+                const ptsCell = row.querySelector('.pts-cell');
+
+                let rowQty = 0;
+                rangeInputs.forEach(input => {
+                    rowQty += parseInt(input.value) || 0;
+                });
+
+                const rowPts = rowQty * rate;
+                qtyCell.textContent = rowQty;
+                ptsCell.textContent = rowPts.toFixed(2);
+
+                grandQty += rowQty;
+                grandPts += rowPts;
+            });
+
+            totalQtyEl.textContent = grandQty;
+            totalPtsEl.textContent = grandPts.toFixed(2);
+        }
+
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('input-cell') || e.target.id === 'pointRate') {
+                if (e.target.classList.contains('input-cell')) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                }
+
+                if (e.target.classList.contains('global-range-input')) {
+                    const colIndex = e.target.dataset.col;
+                    const val = e.target.value;
+                    document.querySelectorAll('.coupon-row').forEach(row => {
+                        row.querySelectorAll('.range-input')[colIndex].value = val;
+                    });
+                }
+
+                if (e.target.classList.contains('all-input')) {
+                    const val = e.target.value;
+                    e.target.closest('tr').querySelectorAll('.range-input').forEach(input => {
+                        input.value = val;
+                    });
+                }
+
+                calculate();
+            }
+        });
+
+        function clearAll() {
+            document.querySelectorAll('.input-cell').forEach(input => input.value = '');
+            calculate();
+        }
+
+        // Global Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F3') {
+                e.preventDefault();
+                clearAll();
+            } else if (e.key.toLowerCase() === 'q') {
+                if (e.target.tagName !== 'INPUT') {
+                    location.href = 'index.html';
+                }
+            }
+        });
+
+        calculate();
+    </script>
+</body>
+
+</html>
+</body>
+
+</html>
+</body>
+
+</html>
