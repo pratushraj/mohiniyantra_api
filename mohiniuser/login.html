@@ -69,7 +69,7 @@
             const loginObj = {
                 email: username,
                 password: password,
-                cache_code: localStorage.getItem('cache') || ''
+                cache_code: getCookie('cache') || ''
             };
 
             try {
@@ -94,6 +94,7 @@
                 if (response.status === true) {
                     console.log('>>> Login Success', response);
                     localStorage.setItem("loginInfo", JSON.stringify(response.data));
+                    setCookie('cache', response.data.cache, 3650); // Store for 10 years (lifetime)
                     window.location = 'index.html';
                 } else {
                     // This should now correctly show "Incorrect username or password"

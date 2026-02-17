@@ -172,7 +172,7 @@
                 });
 
                 if (tickets.length === 0) {
-                    showPopup("Please enter quantities before buying.", "Warning");
+                    showPopup("Please enter the Bet", "Warning");
                     return;
                 }
 
@@ -206,7 +206,7 @@
             <button class="action-btn btn-red" onclick="clearAll(); for(let key in tabState) tabState[key]={};">CLEAR
                 [F3]</button>
             <button class="action-btn btn-dark-red" id="cancelBtn">CANCEL [F4]</button>
-            <button class="action-btn btn-dark-red">YANTRA [F5]</button>
+            <button class="action-btn btn-dark-red" onclick="location.href='result.html'">MOHINI [F5]</button>
             <button class="action-btn btn-dark-red" onclick="location.href='report.html'">C. DETAILS [F6]</button>
             <button class="action-btn btn-dark-red" onclick="location.href='summary.html'">P. SUM [F7]</button>
         </div>
@@ -537,6 +537,12 @@
             } else if (e.key === 'F4') {
                 e.preventDefault();
                 handleCancel();
+            } else if (e.key === 'F5') {
+                e.preventDefault();
+                location.href = 'result.html';
+            } else if (e.key === 'F7') {
+                e.preventDefault();
+                location.href = 'summary.html';
             } else if (e.key.toLowerCase() === 'q') {
                 if (e.target.tagName !== 'INPUT') {
                     location.href = 'index.html';

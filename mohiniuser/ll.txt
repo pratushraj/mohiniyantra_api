@@ -92,7 +92,7 @@
                                     <button class="action-btn btn-green">SUBMIT [F2]</button>
                                     <button class="action-btn btn-red" onclick="clearAll()">CLEAR [F3]</button>
                                     <button class="action-btn btn-dark-red">CANCEL [F4]</button>
-                                    <button class="action-btn btn-dark-red">YANTRA [F5]</button>
+                                    <button class="action-btn btn-dark-red">MOHINI [F5]</button>
                                     <button class="action-btn btn-dark-red" onclick="location.href='report.html'">C. DETAILS [F6]</button>
                                     <button class="action-btn btn-dark-red" onclick="location.href='summary.html'">P. SUM [F7]</button>
                                 </div>

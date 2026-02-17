@@ -5,12 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purchase Summary</title>
+    <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
     <style>
         body {
-            background-color: #f1eeab;
+            background-color: var(--bg-pink) !important;
             margin: 0;
-            font-family: Arial, sans-serif;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
             color: #000;
         }
 
@@ -29,19 +35,194 @@
         }
 
         .header-center {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: bold;
         }
 
         .close-btn {
-            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            background-color: #dc3545;
             color: white;
-            border: 2px solid #333;
-            padding: 2px 20px;
+            border: 1px solid #333;
+            padding: 2px 25px;
             font-size: 24px;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Search Screen Styles */
+        .search-screen {
+            flex: 1;
+            background-color: #f9e79f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .custom-range-inputs {
+            display: flex;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .date-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-box {
+            background-color: #f8f9fa;
+            border: 1px solid #555;
+            padding: 15px 30px;
+            font-size: 36px;
+            min-width: 250px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .cal-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 1px solid #555;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .search-ok-btn {
+            background-color: #1b5e20;
+            color: white;
+            border: 1px solid #000;
+            padding: 10px 150px;
+            font-size: 42px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* 10-Day Selector Popup Styles - MATCHING IMAGE */
+        .selector-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #6e6544;
+            /* Dark brownish overlay from image */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .selector-card {
+            background-color: #dbcc86;
+            /* Tan/Gold color from image */
+            border: 1px solid #bba661;
+            padding: 30px;
+            border-radius: 12px;
+            width: auto;
+            min-width: 800px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .selector-close-x {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            background: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            border: 1px solid #888;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-date-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            /* 4 columns based on image width logic */
+            grid-template-columns: repeat(5, 1fr);
+            /* Actually the image shows 5 */
+            gap: 15px;
+        }
+
+        .date-option {
+            background-color: white;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            user-select: none;
+        }
+
+        .radio-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-option.selected .radio-circle {
+            border-color: #4da6a6;
+        }
+
+        .date-option.selected .radio-circle::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background-color: #4da6a6;
+            border-radius: 50%;
+        }
+
+        .date-text {
+            font-size: 26px;
+            font-weight: 400;
+            color: #000;
+        }
+
+        .selector-footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .selector-ok-btn {
+            background-color: #eee;
+            border: 1px solid #ccc;
+            padding: 10px 80px;
+            border-radius: 35px;
+            font-size: 24px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Results Styles */
+        .results-view {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            background-color: #f1eeab;
         }
 
         .sub-header {
@@ -54,6 +235,8 @@
 
         .table-container {
             width: 100%;
+            flex: 1;
+            overflow-y: auto;
         }
 
         table {
@@ -64,13 +247,13 @@
         th,
         td {
             border: 1px solid #333;
-            padding: 4px 8px;
+            padding: 6px 12px;
             font-size: 22px;
         }
 
         th {
-            border-top: none;
-            font-weight: normal;
+            background-color: #eee8aa;
+            font-weight: bold;
         }
 
         .closing-row {
@@ -81,11 +264,7 @@
             gap: 20px;
             border-top: 2px solid #333;
             border-bottom: 2px solid #333;
-        }
-
-        .val-col {
-            min-width: 100px;
-            text-align: right;
+            background-color: #f1eeab;
         }
     </style>
 </head>
@@ -96,77 +275,179 @@
             <div>0.0.16</div>
             <div id="user-id-display">---</div>
         </div>
-        <div class="header-center" id="summary-title">
-            Purchase Summary From -- To --
+        <div class="header-center">Purchase Summary</div>
+        <button class="close-btn" id="globalCloseBtn">Close</button>
+    </div>
+
+    <!-- Search Screen -->
+    <div class="search-screen" id="searchScreen">
+        <div class="custom-range-inputs">
+            <div class="date-input-wrapper">
+                <div class="date-box" id="fromDateBox">--:--:----</div>
+                <div class="cal-icon">📅</div>
+            </div>
+            <div class="date-input-wrapper">
+                <div class="date-box" id="toDateBox">--:--:----</div>
+                <div class="cal-icon">📅</div>
+            </div>
         </div>
-        <button class="close-btn" onclick="location.href='index.html'">Close</button>
+        <button class="search-ok-btn" id="searchOkBtn">OK</button>
     </div>
 
-    <div class="sub-header">
-        <div id="curr-datetime">--<br>--</div>
-        <div style="display: flex; gap: 40px;">
-            <span>Opening Points</span>
-            <span id="opening_points" style="min-width: 120px; text-align: right;">0.00</span>
+    <!-- Results View -->
+    <div class="results-view" id="resultsView">
+        <div class="sub-header">
+            <div id="curr-datetime" style="font-weight: bold;">--<br>--</div>
+            <div style="display: flex; gap: 40px;">
+                <span>Opening Points</span>
+                <span id="opening_points" style="min-width: 120px; text-align: right; font-weight: bold;">0.00</span>
+            </div>
+        </div>
+
+        <div class="table-container" style="background-color: #f1eeab;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Purchase Points</th>
+                        <th>Gift Points</th>
+                        <th>Net Points</th>
+                        <th>Balance Point</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody"></tbody>
+            </table>
+        </div>
+
+        <div class="closing-row" style="font-weight: bold;">
+            <span>Closing Points</span>
+            <span id="closing_points" style="min-width: 150px; text-align: right;">0.00</span>
         </div>
     </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Purchase Points</th>
-                    <th>Gift Points</th>
-                    <th>Net Points</th>
-                    <th>Balance Point</th>
-                </tr>
-            </thead>
-            <tbody id="pur-fill-opp">
-                <!-- Data populated via JS -->
-            </tbody>
-        </table>
-    </div>
-
-    <div class="closing-row">
-        <span>Closing Points</span>
-        <span id="closing_points" style="min-width: 150px; text-align: right;">0.00</span>
+    <!-- 10-Day Quick Selector Popup -->
+    <div class="selector-overlay" id="selectorOverlay">
+        <div class="selector-card">
+            <div class="selector-close-x" id="closeSelectorX">✕</div>
+            <div class="quick-date-grid" id="quickDateGrid">
+                <!-- Dynamically generated -->
+            </div>
+            <div class="selector-footer">
+                <button class="selector-ok-btn" id="selectorOkBtn">OK</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // console.log(appGlobalConfig);
-            const userId = appGlobalConfig.unique_id || '---';
-            document.getElementById('user-id-display').textContent = userId;
+        let fromDate = new Date();
+        let toDate = new Date();
+        let activeTarget = 'from';
 
-            // Date and Time for Sub-header
-            const now = new Date();
-            const dtStr = formatDate(now);
-            const tmStr = String(now.getHours()).padStart(2, '0') + ':' +
-                String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('curr-datetime').innerHTML = `${dtStr}<br>${tmStr}`;
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('user-id-display').textContent = appGlobalConfig.unique_id || '---';
 
-            // Fetch summary data
+            updateDateBoxes();
+
+            document.getElementById('fromDateBox').addEventListener('click', () => openSelector('from'));
+            document.getElementById('toDateBox').addEventListener('click', () => openSelector('to'));
+
+            document.getElementById('closeSelectorX').addEventListener('click', () => document.getElementById('selectorOverlay').style.display = 'none');
+            document.getElementById('selectorOkBtn').addEventListener('click', () => document.getElementById('selectorOverlay').style.display = 'none');
+
+            document.getElementById('searchOkBtn').addEventListener('click', fetchSummary);
+
+            document.getElementById('globalCloseBtn').addEventListener('click', () => {
+                if (document.getElementById('resultsView').style.display === 'flex') {
+                    document.getElementById('resultsView').style.display = 'none';
+                    document.getElementById('searchScreen').style.display = 'flex';
+                } else {
+                    location.href = 'bulk-coupons.html';
+                }
+            });
+        });
+
+        function openSelector(target) {
+            activeTarget = target;
+            renderQuickGrid();
+            document.getElementById('selectorOverlay').style.display = 'flex';
+        }
+
+        function renderQuickGrid() {
+            const grid = document.getElementById('quickDateGrid');
+            grid.innerHTML = '';
+
+            const today = new Date();
+            const currentSelected = activeTarget === 'from' ? fromDate : toDate;
+
+            // Generate exactly from image: 10 days including today
+            for (let i = 9; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+
+                const d = String(date.getDate()).padStart(2, '0');
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const y = date.getFullYear();
+                const dateStr = `${d}-${m}-${y}`;
+
+                const div = document.createElement('div');
+                div.className = 'date-option';
+
+                if (date.toDateString() === currentSelected.toDateString()) {
+                    div.classList.add('selected');
+                }
+
+                div.innerHTML = `
+                    <div class="radio-circle"></div>
+                    <div class="date-text">${dateStr}</div>
+                `;
+
+                div.onclick = () => {
+                    document.querySelectorAll('.date-option').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+
+                    if (activeTarget === 'from') fromDate = new Date(date);
+                    else toDate = new Date(date);
+
+                    updateDateBoxes();
+                };
+
+                grid.appendChild(div);
+            }
+        }
+
+        function updateDateBoxes() {
+            document.getElementById('fromDateBox').textContent = formatDateStr(fromDate);
+            document.getElementById('toDateBox').textContent = formatDateStr(toDate);
+        }
+
+        function formatDateStr(d) {
+            return String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear();
+        }
+
+        async function fetchSummary() {
+            if (fromDate > toDate) {
+                showPopup("Please correct the dates and try again", "Warning");
+                return;
+            }
+
+            const body = document.getElementById('summaryBody');
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+
             try {
-                const formattedDate = formatDate(now);
-
                 const response = await fetch(CONFIG.PURCHASE_SUMMARY_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         user_id: appGlobalConfig.userId,
-                        from_date: formattedDate,
-                        to_date: formattedDate
+                        from_date: formatDate(fromDate),
+                        to_date: formatDate(toDate)
                     })
                 });
 
                 const json = await response.json();
-
                 if (json.status && json.data && json.data.length > 0) {
+                    body.innerHTML = '';
                     const data = json.data;
-                    const tableBody = document.getElementById('pur-fill-opp');
-                    tableBody.innerHTML = '';
-
-                    document.getElementById('summary-title').textContent = `Purchase Summary From ${formatDate(data[0].date)} To ${formatDate(data[data.length - 1].date)}`;
                     document.getElementById('opening_points').textContent = data[0].opening_balance || "0.00";
                     document.getElementById('closing_points').textContent = data[data.length - 1].balance_pts || "0.00";
 
@@ -179,15 +460,27 @@
                             <td style="text-align: right;">${parseFloat(obj.net_pts).toFixed(2)}</td>
                             <td style="text-align: right;">${parseFloat(obj.balance_pts).toFixed(2)}</td>
                         `;
-                        tableBody.appendChild(tr);
+                        body.appendChild(tr);
                     });
+
+                    const now = new Date();
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const year = now.getFullYear();
+                    const time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                    document.getElementById('curr-datetime').innerHTML = `${day}-${month}-${year}<br>${time}`;
+
+                    document.getElementById('searchScreen').style.display = 'none';
+                    document.getElementById('resultsView').style.display = 'flex';
                 } else {
-                    document.getElementById('pur-fill-opp').innerHTML = `<tr><td colspan="5" style="text-align:center;">No records.</td></tr>`;
+                    body.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records found.</td></tr>';
+                    document.getElementById('searchScreen').style.display = 'none';
+                    document.getElementById('resultsView').style.display = 'flex';
                 }
-            } catch (error) {
-                console.error("Load Error:", error);
+            } catch (e) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Error loading data.</td></tr>';
             }
-        });
+        }
     </script>
 </body>
 

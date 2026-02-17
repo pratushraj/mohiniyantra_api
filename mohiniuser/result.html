@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Mohini Group</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: var(--bg-pink) !important;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 14px;
+            background-color: #eee8aa;
+            border-bottom: 2px solid #555;
+        }
+
+        .close-btn {
+            background-color: #dc3545;
+            color: white;
+            border: 1px solid #000;
+            padding: 2px 20px;
+            font-size: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Search Screen Styles (image.png style) */
+        .search-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .date-search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .date-display-box {
+            background: #f8f9fa;
+            border: 1px solid #555;
+            padding: 15px 30px;
+            font-size: 40px;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .calendar-icon-btn {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: 1px solid #555;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .search-ok-btn {
+            background-color: #1b5e20;
+            color: white;
+            border: 1px solid #000;
+            padding: 10px 100px;
+            font-size: 38px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 380px;
+            text-align: center;
+        }
+
+        /* Calendar Popover (Capture5.PNG style) */
+        .calendar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .calendar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            position: relative;
+            animation: fadeInScale 0.2s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .calendar-close-x {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            border: 1px solid #ddd;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-arrow {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-month-year {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .day-label {
+            font-weight: 500;
+            padding-bottom: 10px;
+        }
+
+        .day-label.sunday {
+            color: red;
+        }
+
+        .calendar-day {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .calendar-day.selected {
+            background-color: #007bff !important;
+            color: white !important;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+
+        .calendar-card-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .calendar-card-ok {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 50px;
+            border-radius: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Results Screen */
+        .results-view {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .date-display-header {
+            text-align: center;
+            font-size: 24px;
+            margin: 10px 0;
+            color: #007bff;
+        }
+
+        .result-table-container {
+            padding: 0 10px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .res-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-row th {
+            background-color: #eee8aa !important;
+            color: red;
+            font-size: 32px;
+            padding: 10px;
+            border: 2px solid #555;
+        }
+
+        .res-table th {
+            background-color: #fff5e6;
+            color: red;
+            font-size: 22px;
+            padding: 5px;
+            border: 2px solid #555;
+        }
+
+        .res-table td {
+            background-color: #fff5e6;
+            border: 2px solid #555;
+            padding: 4px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .msg-container {
+            text-align: center;
+            padding: 20px;
+            font-size: 20px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="result-header">
+        <span>0.0.16</span>
+        <button class="close-btn" id="headerCloseBtn">Close</button>
+    </div>
+
+    <!-- 1. Search Screen (image.png style) -->
+    <div class="search-screen" id="searchScreen">
+        <div class="date-search-box" id="openCalendarBtn">
+            <div class="date-display-box" id="searchDateDisplay">--:--:----</div>
+            <div class="calendar-icon-btn">📅</div>
+        </div>
+        <button class="search-ok-btn" id="searchOkBtn">OK</button>
+    </div>
+
+    <!-- 2. Results Screen -->
+    <div class="results-view" id="resultsView">
+        <div class="date-display-header" id="resultsDateHeader">-- --- ----</div>
+        <div class="result-table-container">
+            <table class="res-table">
+                <thead>
+                    <tr class="header-row">
+                        <th style="width: 30%;">Gift Event Code</th>
+                        <th colspan="4">MOHINI GROUP</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody"></tbody>
+            </table>
+            <div id="loaderMsg" class="msg-container">Loading Results...</div>
+        </div>
+    </div>
+
+    <!-- 3. Calendar Overlay (Capture5.PNG style) -->
+    <div class="calendar-overlay" id="calendarOverlay">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="date-display-header" style="color: #007bff; font-size: 32px; margin-bottom: 20px;"
+                id="popupHeaderDate">-- --- ----</div>
+            <div class="calendar-card">
+                <div class="calendar-close-x" id="closeCalendarX">✕</div>
+                <div class="calendar-nav">
+                    <div class="nav-arrow" id="prevMonth">❮</div>
+                    <div class="current-month-year" id="monthYearDisplay">Month Year</div>
+                    <div class="nav-arrow" id="nextMonth">❯</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <div class="day-label sunday">S</div>
+                    <div class="day-label">M</div>
+                    <div class="day-label">T</div>
+                    <div class="day-label">W</div>
+                    <div class="day-label">T</div>
+                    <div class="day-label">F</div>
+                    <div class="day-label">S</div>
+                </div>
+                <div class="calendar-card-footer">
+                    <button class="calendar-card-ok" id="calendarApplyBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        let selectedDate = new Date();
+        let viewDate = new Date();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSearchDisplay();
+
+            // Open Calendar
+            document.getElementById('openCalendarBtn').addEventListener('click', () => {
+                document.getElementById('calendarOverlay').style.display = 'flex';
+                renderCalendar();
+            });
+
+            // Close Calendar
+            document.getElementById('closeCalendarX').addEventListener('click', () => {
+                document.getElementById('calendarOverlay').style.display = 'none';
+            });
+
+            // Apply Date
+            document.getElementById('calendarApplyBtn').addEventListener('click', () => {
+                updateSearchDisplay();
+                document.getElementById('calendarOverlay').style.display = 'none';
+            });
+
+            // Navigation
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                viewDate.setMonth(viewDate.getMonth() - 1);
+                renderCalendar();
+            });
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                viewDate.setMonth(viewDate.getMonth() + 1);
+                renderCalendar();
+            });
+
+            // Final Search OK
+            document.getElementById('searchOkBtn').addEventListener('click', () => {
+                const apiDate = formatDate(selectedDate);
+                const displayDateFull = `${selectedDate.getDate()} ${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+
+                document.getElementById('resultsDateHeader').textContent = displayDateFull;
+                document.getElementById('searchScreen').style.display = 'none';
+                document.getElementById('resultsView').style.display = 'flex';
+                fetchResults(apiDate);
+            });
+
+            // Global Close
+            document.getElementById('headerCloseBtn').addEventListener('click', () => {
+                if (document.getElementById('resultsView').style.display === 'flex') {
+                    document.getElementById('resultsView').style.display = 'none';
+                    document.getElementById('searchScreen').style.display = 'flex';
+                } else {
+                    location.href = 'bulk-coupons.html';
+                }
+            });
+        });
+
+        function updateSearchDisplay() {
+            // Display date as 16-02-2026 for the main box (image.png style)
+            const day = String(selectedDate.getDate()).padStart(2, '0');
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const year = selectedDate.getFullYear();
+            document.getElementById('searchDateDisplay').textContent = `${day}-${month}-${year}`;
+
+            // Header for popup (Capture5.PNG style)
+            document.getElementById('popupHeaderDate').textContent = `${selectedDate.getDate()} ${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthYearDisp = document.getElementById('monthYearDisplay');
+            const labels = grid.querySelectorAll('.day-label');
+            grid.innerHTML = '';
+            labels.forEach(l => grid.appendChild(l));
+
+            const y = viewDate.getFullYear();
+            const m = viewDate.getMonth();
+            monthYearDisp.textContent = `${monthNames[m]} ${y}`;
+
+            const firstDay = new Date(y, m, 1).getDay();
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            const prevMonthLastDay = new Date(y, m, 0).getDate();
+
+            for (let i = firstDay; i > 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = prevMonthLastDay - i + 1;
+                grid.appendChild(day);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+                if (selectedDate.getDate() === i && selectedDate.getMonth() === m && selectedDate.getFullYear() === y) {
+                    day.classList.add('selected');
+                }
+                day.addEventListener('click', () => {
+                    selectedDate = new Date(y, m, i);
+                    updateSearchDisplay();
+                    renderCalendar();
+                });
+                grid.appendChild(day);
+            }
+
+            while (grid.children.length < 49) { // 7 labels + 42 cells
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = grid.children.length - 7 - (firstDay + daysInMonth) + 1;
+                grid.appendChild(day);
+            }
+        }
+
+        async function fetchResults(dateStr) {
+            const body = document.getElementById('resultBody');
+            const loader = document.getElementById('loaderMsg');
+            body.innerHTML = '';
+            loader.textContent = "Loading Results...";
+            loader.style.display = 'block';
+            try {
+                const res = await fetch(CONFIG.GIFT_EVENT_CODE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date: dateStr })
+                });
+                const json = await res.json();
+                loader.style.display = 'none';
+                if (json.status && json.data && json.data.length > 0) {
+                    const sorted = json.data.sort((a, b) => Object.keys(b)[0].localeCompare(Object.keys(a)[0]));
+                    sorted.forEach(item => {
+                        const time = Object.keys(item)[0];
+                        const codes = item[time];
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${time}</td><td>${codes[0] || '--'}</td><td>${codes[1] || '--'}</td><td>${codes[2] || '--'}</td><td>${codes[3] || '--'}</td>`;
+                        body.appendChild(tr);
+                    });
+                } else {
+                    loader.textContent = "No results found for " + dateStr;
+                    loader.style.display = 'block';
+                }
+            } catch (e) {
+                loader.textContent = "Error loading results.";
+                loader.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+
+</html>
