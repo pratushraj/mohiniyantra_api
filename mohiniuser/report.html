@@ -128,68 +128,66 @@
                     let hasShownAny = false;
 
                     json.data.forEach(gameType => {
-                        gameType.purchases.forEach(purchase => {
-                            purchase.events.forEach(event => {
-                                // Filter by time range
-                                const drawTime = event.draw_time; // e.g., "09:30"
-                                const isVisible = isNoTimeFilter || (drawTime >= fromTime && drawTime <= toTime);
+                        gameType.events.forEach(event => {
+                            // Filter by time range
+                            const drawTime = event.draw_time; // e.g., "09:30"
+                            const isVisible = isNoTimeFilter || (drawTime >= fromTime && drawTime <= toTime);
 
-                                if (isVisible) {
-                                    hasShownAny = true;
+                            if (isVisible) {
+                                hasShownAny = true;
 
-                                    let eventTotalPoints = 0;
-                                    let eventShown = false;
+                                let eventTotalPoints = 0;
+                                let eventShown = false;
 
-                                    event.tickets.forEach(ticket => {
-                                        const tr = document.createElement('tr');
+                                event.tickets.forEach(ticket => {
+                                    const tr = document.createElement('tr');
 
-                                        let selectedDisplay = "";
-                                        if (ticket.number.includes('-')) {
-                                            const parts = ticket.number.split('-');
-                                            selectedDisplay = `${gameType.game_type_code}${parts[0]} - ${gameType.game_type_code}${parts[1]}`;
-                                        } else {
-                                            selectedDisplay = `${gameType.game_type_code}${ticket.number}`;
-                                        }
+                                    let selectedDisplay = "";
+                                    if (ticket.number.includes('-')) {
+                                        const parts = ticket.number.split('-');
+                                        selectedDisplay = `${gameType.game_type_code}${parts[0]} - ${gameType.game_type_code}${parts[1]}`;
+                                    } else {
+                                        selectedDisplay = `${gameType.game_type_code}${ticket.number}`;
+                                    }
 
-                                        eventTotalPoints += parseFloat(ticket.amount);
+                                    eventTotalPoints += parseFloat(ticket.amount);
 
-                                        if (!eventShown) {
-                                            tr.innerHTML = `
-                                                <td>${globalIdx++}</td>
-                                                <td>${event.gifteventcode}</td>
-                                                <td>${selectedDisplay}</td>
-                                                <td>${ticket.qty}</td>
-                                            `;
-                                            eventShown = true;
-                                        } else {
-                                            tr.innerHTML = `
-                                                <td></td>
-                                                <td></td>
-                                                <td>${selectedDisplay}</td>
-                                                <td>${ticket.qty}</td>
-                                            `;
-                                        }
-                                        tbody.appendChild(tr);
-                                    });
+                                    if (!eventShown) {
+                                        tr.innerHTML = `
+                                            <td>${globalIdx++}</td>
+                                            <td>${event.gifteventcode}</td>
+                                            <td>${selectedDisplay}</td>
+                                            <td>${ticket.qty}</td>
+                                        `;
+                                        eventShown = true;
+                                    } else {
+                                        tr.innerHTML = `
+                                            <td></td>
+                                            <td></td>
+                                            <td>${selectedDisplay}</td>
+                                            <td>${ticket.qty}</td>
+                                        `;
+                                    }
+                                    tbody.appendChild(tr);
+                                });
 
-                                    // Total Points Row for this event
-                                    const totalTr = document.createElement('tr');
-                                    totalTr.style.backgroundColor = "var(--header-bg)";
-                                    totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points (${gameType.game_type_code}): ${eventTotalPoints.toFixed(3)}</td>`;
-                                    tbody.appendChild(totalTr);
+                                // Total Points Row for this event
+                                const totalTr = document.createElement('tr');
+                                totalTr.style.backgroundColor = "var(--header-bg)";
+                                totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points (${gameType.game_type_code}): ${eventTotalPoints.toFixed(3)}</td>`;
+                                tbody.appendChild(totalTr);
 
-                                    // Gift Rows (kept as placeholders as per original code)
-                                    const giftPtsTr = document.createElement('tr');
-                                    giftPtsTr.style.backgroundColor = "var(--header-bg)";
-                                    giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are 0</td>`;
-                                    tbody.appendChild(giftPtsTr);
+                                // Gift Rows (kept as placeholders as per original code)
+                                const giftPtsTr = document.createElement('tr');
+                                giftPtsTr.style.backgroundColor = "var(--header-bg)";
+                                giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are 0</td>`;
+                                tbody.appendChild(giftPtsTr);
 
-                                    const giftCodeTr = document.createElement('tr');
-                                    giftCodeTr.style.backgroundColor = "var(--header-bg)";
-                                    giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: --</td>`;
-                                    tbody.appendChild(giftCodeTr);
-                                }
-                            });
+                                const giftCodeTr = document.createElement('tr');
+                                giftCodeTr.style.backgroundColor = "var(--header-bg)";
+                                giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: --</td>`;
+                                tbody.appendChild(giftCodeTr);
+                            }
                         });
                     });
 

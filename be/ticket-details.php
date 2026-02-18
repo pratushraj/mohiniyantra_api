@@ -23,13 +23,13 @@ if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $date)) {
 }
 
 // Fetch tickets joined with time_slots and game_types
-// Grouped by game_type first, then purchase_date (DESC), then draw time
+// Grouped by game_type first, then draw time
 $sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code 
         FROM tickets t
         LEFT JOIN time_slots ts ON t.time_slot_id = ts.time_slot_id
         LEFT JOIN game_types gt ON t.game_type_id = gt.game_type_id
         WHERE t.user_id = '$user_id' AND t.ticket_date = '$date' 
-        ORDER BY t.game_type_id ASC, t.purchase_date DESC, ts.time ASC";
+        ORDER BY t.game_type_id ASC, ts.time ASC, t.purchase_date ASC";
 
 $result = mysqli_query($conn, $sql);
 
@@ -44,7 +44,6 @@ $grouped_data = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $gt_id = $row['game_type_id'];
     $gt_code = $row['game_type_code'];
-    $purchase_date = $row['purchase_date'];
     $draw_time = substr($row['draw_time'], 0, 5); // 09:30:00 -> 09:30
     $event_code = $row['ticket_date'] . ' ' . $draw_time;
 
@@ -52,19 +51,12 @@ while ($row = mysqli_fetch_assoc($result)) {
         $grouped_data[$gt_id] = [
             'game_type_id' => $gt_id,
             'game_type_code' => $gt_code,
-            'purchases' => []
-        ];
-    }
-
-    if (!isset($grouped_data[$gt_id]['purchases'][$purchase_date])) {
-        $grouped_data[$gt_id]['purchases'][$purchase_date] = [
-            'purchase_date' => $purchase_date,
             'events' => []
         ];
     }
 
-    if (!isset($grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code])) {
-        $grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code] = [
+    if (!isset($grouped_data[$gt_id]['events'][$event_code])) {
+        $grouped_data[$gt_id]['events'][$event_code] = [
             'gifteventcode' => $event_code,
             'draw_time' => $draw_time,
             'event_total_amount' => 0,
@@ -105,25 +97,20 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 
     foreach ($tickets_to_add as $t) {
-        $grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code]['tickets'][] = $t;
+        $grouped_data[$gt_id]['events'][$event_code]['tickets'][] = $t;
     }
 
-    $grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code]['event_total_amount'] += $row['amount'];
+    $grouped_data[$gt_id]['events'][$event_code]['event_total_amount'] += $row['amount'];
 }
 
 // Convert to indexed array for response
 $final_output = [];
 foreach ($grouped_data as $gt) {
-    $formatted_purchases = [];
-    foreach ($gt['purchases'] as $p) {
-        $formatted_events = [];
-        foreach ($p['events'] as $e) {
-            $formatted_events[] = $e;
-        }
-        $p['events'] = $formatted_events;
-        $formatted_purchases[] = $p;
+    $events = [];
+    foreach ($gt['events'] as $e) {
+        $events[] = $e;
     }
-    $gt['purchases'] = $formatted_purchases;
+    $gt['events'] = $events;
     $final_output[] = $gt;
 }
 
