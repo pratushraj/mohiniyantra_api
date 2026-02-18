@@ -22,9 +22,9 @@ if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $date)) {
     $date = date('Y-m-d', strtotime($date));
 }
 
-// 1. Fetch available results for this date to display in report
+// 1. Fetch available results for this date (Prefer non-empty result_number)
 $results_map = [];
-$res_query = "SELECT time_slot_id, game_type_id, result_number FROM results WHERE result_date = '$date'";
+$res_query = "SELECT time_slot_id, game_type_id, result_number FROM results WHERE result_date = '$date' AND result_number IS NOT NULL AND result_number != ''";
 $res_sql = mysqli_query($conn, $res_query);
 if ($res_sql) {
     while ($r = mysqli_fetch_assoc($res_sql)) {
@@ -32,7 +32,7 @@ if ($res_sql) {
     }
 }
 
-// 2. Fetch tickets joined with time_slots and game_types
+// 2. Fetch tickets
 $sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code 
         FROM tickets t
         LEFT JOIN time_slots ts ON t.time_slot_id = ts.time_slot_id
@@ -70,7 +70,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             'game_type_code' => $row['game_type_code'],
             'game_type_id' => $gt_id,
             'winning_number' => $winning_no,
-            'batch_winning_amount' => 0, // Track total win for this batch
+            'batch_winning_amount' => 0,
             'tickets' => []
         ];
     }
@@ -80,17 +80,13 @@ while ($row = mysqli_fetch_assoc($result)) {
     $win_no = $grouped_data[$batch_key]['winning_number'];
 
     if ($row['game_id'] == 2) {
-        // Bulk B: Expansion
         $part_amount = $row['amount'] / 10;
         for ($i = 0; $i <= 9; $i++) {
             $num = $i . $n;
-
-            // Winning check
             $win_amt = 0;
             if ($win_no !== null && $num == $win_no) {
                 $win_amt = $part_amount * 90;
             }
-
             $tickets_to_add[] = [
                 'number' => $num,
                 'qty' => $row['qty'],
@@ -102,22 +98,18 @@ while ($row = mysqli_fetch_assoc($result)) {
             $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
         }
     } else {
-        // Bulk A or Loose
         $display_number = $n;
         if ($row['game_id'] == 1) {
             $display_number = "0$n-9$n";
         }
 
-        // Winning check (Bulk A covers multiple numbers, we check which one wins)
         $win_amt = 0;
         if ($win_no !== null) {
             if ($row['game_id'] == 1) {
-                // If the second digit matches the selected index $n
                 if (strlen($win_no) == 2 && substr($win_no, 1, 1) == $n) {
-                    $win_amt = $row['amount'] / 10 * 90; // total / 10 * 90 = total * 9
+                    $win_amt = ($row['amount'] / 10) * 90;
                 }
             } else if ($row['game_id'] == 3) {
-                // Loose:Direct match
                 if ($n == $win_no) {
                     $win_amt = $row['amount'] * 90;
                 }
@@ -140,7 +132,6 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 }
 
-// Convert to simple indexed array
 $final_output = array_values($grouped_data);
 
 if (empty($final_output)) {
