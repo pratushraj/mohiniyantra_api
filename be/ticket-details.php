@@ -29,7 +29,7 @@ $sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code
         LEFT JOIN time_slots ts ON t.time_slot_id = ts.time_slot_id
         LEFT JOIN game_types gt ON t.game_type_id = gt.game_type_id
         WHERE t.user_id = '$user_id' AND t.ticket_date = '$date' 
-        ORDER BY t.game_type_id ASC, ts.time ASC, t.purchase_date ASC";
+        ORDER BY t.game_type_id ASC, ts.time DESC, t.purchase_date ASC";
 
 $result = mysqli_query($conn, $sql);
 
