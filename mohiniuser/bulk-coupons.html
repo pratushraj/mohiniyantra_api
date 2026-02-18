@@ -20,7 +20,7 @@
     <style>
         .input-cell {
             padding: 2px !important;
-            font-size: 18px !important;
+            font-size: 24px !important;
             font-weight: 600 !important;
         }
     </style>
@@ -28,26 +28,31 @@
 
 <body>
     <div class="top-bar">
+        <div class="version-info">0.0.12</div>
         <div class="top-info">
-            <span>Welcome : 2101400016</span>
-            <span>Balance Point : 97885.30</span>
+            <span id="welcome-id">Welcome : 2101400016</span>
+            <span id="balance-pts">Balance Point : 97885.30</span>
         </div>
-        <div class="top-info" style="text-align: right;">
-            <span>Date : 28:01:2026</span><br>
-            <span>Gift Event Code : 09:30</span><br>
-            <span>Countdown : 00:00:58</span>
+        <div class="top-right-info">
+            <button class="lobby-btn" onclick="location.href='index.html'">LOBBY [Q]</button>
         </div>
-        <button class="lobby-btn" onclick="location.href='index.html'">LOBBY [Q]</button>
     </div>
 
     <div class="container fade-in">
-        <div class="menu-tabs">
-            <button class="tab tab-bulk-a active" onclick="location.href='bulk-coupons.html'">Bulk Coupons [ A
-                ]</button>
-            <button class="tab tab-bulk-b" onclick="location.href='bulk-coupons-b.html'">Bulk Coupons [ B ]</button>
-            <button class="tab tab-pointwise">Pointwise Coupons</button>
-            <button class="tab tab-loose" onclick="location.href='loose-coupons.html'">Loose Coupons</button>
-            <button class="tab tab-loose-pointwise">Loose Pointwise Coupons</button>
+        <div class="tabs-row">
+            <div class="menu-tabs">
+                <button class="tab tab-bulk-a active" onclick="location.href='bulk-coupons.html'">Bulk Coupons [ A
+                    ]</button>
+                <button class="tab tab-bulk-b" onclick="location.href='bulk-coupons-b.html'">Bulk Coupons [ B ]</button>
+                <button class="tab tab-pointwise">Pointwise Coupons</button>
+                <button class="tab tab-loose" onclick="location.href='loose-coupons.html'">Loose Coupons</button>
+                <button class="tab tab-loose-pointwise">Loose Pointwise Coupons</button>
+            </div>
+            <div class="tabs-right">
+                <span id="current-date">Date : 18:02:2026</span>
+                <span id="event-code">Gift Event Code : 11:00</span>
+                <span id="countdown-timer">Countdown : 00:04:16</span>
+            </div>
         </div>
 
         <div style="display: none;">
@@ -58,8 +63,8 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Product Group</th>
-                        <th>Gift Coin</th>
+                        <th style="width: 200px;">Product Group</th>
+                        <th style="width: 100px;">Gift Coin</th>
                         <th>00-09</th>
                         <th>10-19</th>
                         <th>20-29</th>
@@ -71,9 +76,9 @@
                         <th>80-89</th>
                         <th>90-99</th>
                         <th>All</th>
-                        <th>Qty</th>
-                        <th>Pts</th>
-                        <th id="draw-time-header">--:--</th>
+                        <th style="width: 80px;">Qty</th>
+                        <th style="width: 80px;">Pts</th>
+                        <th id="draw-time-header" style="width: 100px;">--:--</th>
                     </tr>
                 </thead>
                 <tbody id="couponBody">
@@ -116,10 +121,10 @@
             <button class="action-btn btn-green">UPCOMMING [F1]</button>
             <button class="action-btn btn-green" id="buyBtn">SUBMIT [F2]</button>
             <button class="action-btn btn-red" onclick="clearAll()">CLEAR [F3]</button>
-            <button class="action-btn btn-dark-red" id="cancelBtn">CANCEL [F4]</button>
-            <button class="action-btn btn-dark-red" onclick="location.href='result.html'">MOHINI [F5]</button>
-            <button class="action-btn btn-dark-red" onclick="location.href='report.html'">C. DETAILS [F6]</button>
-            <button class="action-btn btn-dark-red" onclick="location.href='summary.html'">P. SUM [F7]</button>
+            <button class="action-btn btn-red" id="cancelBtn">CANCEL [F4]</button>
+            <button class="action-btn btn-red" onclick="location.href='result.html'">YANTRA [F5]</button>
+            <button class="action-btn btn-red" onclick="location.href='report.html'">C. DETAILS [F6]</button>
+            <button class="action-btn btn-red" onclick="location.href='summary.html'">P. SUM [F7]</button>
         </div>
     </div>
 
@@ -393,7 +398,7 @@
         }
 
         document.addEventListener('input', (e) => {
-            if (e.target.classList.contains('input-cell') || e.target.id === 'pointRate') {
+            if (e.target && e.target.classList && (e.target.classList.contains('input-cell') || e.target.id === 'pointRate')) {
                 if (e.target.classList.contains('input-cell')) {
                     e.target.value = e.target.value.replace(/[^0-9]/g, '');
                 }
@@ -426,17 +431,13 @@
         });
 
         document.addEventListener('focus', (e) => {
-            if (e.target.classList.contains('global-range-input') || e.target.classList.contains('all-input')) {
-                e.target.setAttribute('data-prev-val', '0');
-                e.target.value = '';
+            if (e.target && e.target.classList && (e.target.classList.contains('global-range-input') || e.target.classList.contains('all-input'))) {
+                e.target.setAttribute('data-prev-val', e.target.value || '0');
             }
         }, true);
 
         document.addEventListener('blur', (e) => {
-            if (e.target.classList.contains('global-range-input') || e.target.classList.contains('all-input')) {
-                e.target.value = '';
-                e.target.removeAttribute('data-prev-val');
-            }
+            // No longer clearing value on blur to allow persistence
         }, true);
 
         function clearAll() {

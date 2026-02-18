@@ -203,13 +203,14 @@ async function updateLiveHeader() {
             window.appGameDetails.eventCode = json.data.end_time.substring(0, 5);
             window.appGameDetails.prev_game_results = json.data.prev_game_results || [];
 
-            const dateSpans = document.querySelectorAll('.top-info span');
+            const dateSpans = document.querySelectorAll('span');
             dateSpans.forEach(span => {
                 if (span.textContent.includes('Date :')) span.textContent = `Date : ${formatDate(window.appGameDetails.date)}`;
                 if (span.textContent.includes('Gift Event Code :')) span.textContent = `Gift Event Code : ${window.appGameDetails.eventCode}`;
             });
 
             if (typeof updateDynamicUI === 'function') updateDynamicUI();
+            if (typeof updateCountdownUI === 'function') updateCountdownUI();
         }
     } catch (e) {
         console.error("Failed to fetch game details", e);
@@ -249,7 +250,7 @@ async function updateLiveBalance() {
         if (json.status) {
             appGlobalConfig.balance = json.data;
             // Update all balance spans
-            const balanceSpans = document.querySelectorAll('.top-info span');
+            const balanceSpans = document.querySelectorAll('span');
             balanceSpans.forEach(span => {
                 if (span.textContent.includes('Balance Point :')) span.textContent = `Balance Point : ${appGlobalConfig.balance}`;
             });
@@ -259,33 +260,32 @@ async function updateLiveBalance() {
     }
 }
 
+function updateCountdownUI() {
+    if (!window.appGameDetails || !window.appGameDetails.endTime) return;
+
+    const now = new Date();
+    const [hours, minutes, seconds] = window.appGameDetails.endTime.split(':');
+    const target = new Date();
+    target.setHours(hours, minutes, seconds, 0);
+
+    let diff = target - now;
+    if (diff < 0) diff = 0;
+
+    const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+    const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+    const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+
+    const countdownSpans = document.querySelectorAll('span');
+    countdownSpans.forEach(span => {
+        if (span.textContent.includes('Countdown :')) {
+            span.textContent = `Countdown : ${h}:${m}:${s}`;
+        }
+    });
+}
+
 function startCountdown() {
-    setInterval(() => {
-        if (!window.appGameDetails || !window.appGameDetails.endTime) return;
-
-        const now = new Date();
-        const [hours, minutes, seconds] = window.appGameDetails.endTime.split(':');
-        const target = new Date();
-        target.setHours(hours, minutes, seconds, 0);
-
-        let diff = target - now;
-
-        // If target passed for today, target is next day? 
-        // Based on current_game_details.php, it already handles date wrapping.
-        // But if diff < 0 and the date is today, we might want to stay at 00:00:00 or handle it.
-        if (diff < 0) diff = 0;
-
-        const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-        const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-
-        const countdownSpans = document.querySelectorAll('.top-info span');
-        countdownSpans.forEach(span => {
-            if (span.textContent.includes('Countdown :')) {
-                span.textContent = `Countdown : ${h}:${m}:${s}`;
-            }
-        });
-    }, 1000);
+    updateCountdownUI(); // Initial call
+    setInterval(updateCountdownUI, 1000);
 }
 
 // Initialize live updates if logged in

@@ -1,14 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
 :root {
-    --bg-pink: #f27289;
-    --card-bg: #fff5e6;
-    --header-bg: #eee8aa;
-    --text-color: #333;
-    --accent-green: #28a745;
-    --accent-red: #dc3545;
-    --accent-blue: #007bff;
-    --nav-blue: #00004d;
+    --bg-pink: #e96681;
+    --card-bg: #fff8c0;
+    --header-bg: #fff8c0;
+    --text-color: #000166;
+    --accent-green: #008000;
+    --accent-red: #c02016;
+    --nav-blue: #000165;
     --nav-purple: #7d4071;
     --nav-dark: #000033;
     --glass-bg: rgba(255, 255, 255, 0.2);
@@ -32,62 +31,119 @@ body {
 
 /* Header & Navigation */
 .top-bar {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 5px 55px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
+    position: relative;
+    min-height: 85px;
+}
+
+.version-info {
+    position: absolute;
+    top: 2px;
+    left: 8px;
+    font-size: 14px;
+    color: #000;
+    font-weight: 400;
 }
 
 .top-info {
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 20px;
+}
+
+.top-info span {
+    color: var(--text-color);
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.top-right-info {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 5px;
 }
 
 .lobby-btn {
-    background: linear-gradient(to bottom, #ffd700, #daa520);
-    border: none;
-    padding: 5px 15px;
-    border-radius: 5px;
+    background: linear-gradient(to bottom, #f1c40f, #f39c12);
+    border: 1px solid #d35400;
+    padding: 6px 40px;
+    border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    font-size: 19px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: 5px;
 }
 
 /* Main Container */
 .container {
-    padding: 57px;
+    padding: 55px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding-top: 10px;
+    padding-top: 0px;
 }
 
 /* Menu Tabs */
+.tabs-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 5px;
+}
+
 .menu-tabs {
     display: flex;
-    gap: 5px;
-    margin-bottom: 0px;
+    gap: 8px;
+}
+
+.tabs-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: var(--text-color);
+}
+
+.tabs-right span {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+#countdown-timer {
+    color: #fff;
 }
 
 .tab {
-    padding: 10px 15px;
-    border-radius: 5px 5px 0 0;
+    padding: 12px 25px;
+    border-radius: 4px;
     border: none;
     color: white;
-    font-size: 13px;
+    font-size: 14px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.1s;
+    font-weight: 400;
 }
 
-.tab:hover {
-    transform: translateY(-2px);
+.tab:active {
+    transform: translateY(2px);
 }
 
 .tab.active {
     background-color: var(--card-bg) !important;
     color: var(--text-color) !important;
     font-weight: bold;
+    border: 1px solid #999;
 }
 
 .tab-bulk-a {
@@ -104,7 +160,7 @@ body {
 }
 
 .tab-loose {
-    background-color: var(--nav-dark);
+    background-color: var(--nav-blue);
 }
 
 .tab-loose-pointwise {
@@ -114,64 +170,58 @@ body {
 /* Table Section */
 .data-table-container {
     background-color: var(--card-bg);
-    border: 2px solid #ccc;
+    border: 1px solid #999;
     overflow-x: auto;
 }
 
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .data-table th,
 .data-table td {
-    border: 2px solid #999;
-    padding: 2px 5px;
+    border: 1px solid #bba;
+    padding: 6px 10px;
     text-align: center;
-    color: darkred;
+    color: var(--text-color);
 }
 
 .data-table th {
     background-color: var(--header-bg);
-    color: #8b4513;
-    font-weight: 600;
+    color: #4a90e2;
+    /* Bluish color for headers in image? Actually let's look closer */
+    color: #0056b3;
+    font-weight: 500;
 }
 
-.data-table tr:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.02);
+.data-table tr td:first-child {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.input-cell,
+.grid-input {
+    text-align: center;
+    background-color: white;
+    font-size: 24px;
+    font-weight: 600;
+    outline: none;
+    caret-color: transparent;
+    position: relative;
 }
 
 .input-cell {
-    width: 40px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    text-align: center;
-    /* background-color: #ccffcc; */
-    /* Light Green */
-    transition: background-color 0.2s;
+    width: 55px;
+    height: 41px;
+    padding: 2px;
+    border: 0.5px solid #aaa;
 }
 
-.grid-input {
-    transition: background-color 0.2s;
-}
-
+.input-cell:focus,
 .grid-input:focus {
     background-color: #69f769 !important;
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    caret-color: transparent;
-    /* Hide default cursor */
-    position: relative;
-}
-
-.input-cell:focus {
-    background-color: #69f769 !important;
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    caret-color: transparent;
-    /* Hide default cursor */
-    position: relative;
 }
 
 /* Custom 4px thick cursor */
@@ -198,69 +248,43 @@ body {
     }
 }
 
-@keyframes thickBlink {
-    0% {
-        border-color: #006400;
-    }
-
-    50% {
-        border-color: #32cd32;
-    }
-
-    100% {
-        border-color: #006400;
-    }
-}
-
-/* Hide number input spinners */
-.input-cell::-webkit-outer-spin-button,
-.input-cell::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.input-cell[type=number] {
-    -moz-appearance: textfield;
-    appearance: none;
-}
-
 /* Bottom Buttons */
 .bottom-actions {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    padding: 17px 0;
+    gap: 15px;
+    padding: 20px 0;
     flex-wrap: wrap;
 }
 
 .action-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+    padding: 10px 25px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
     color: white;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
-    min-width: 120px;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-    transition: 0.2s;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    min-width: 130px;
+    font-size: 18px;
+    transition: 0.1s;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .action-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: none;
 }
 
 .btn-green {
-    background: linear-gradient(to bottom, #2ecc71, #27ae60);
+    background-color: #008000;
 }
 
 .btn-red {
-    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    background-color: #c02026;
 }
 
 .btn-dark-red {
-    background: linear-gradient(to bottom, #c0392b, #8b0000);
+    background-color: #c02026;
 }
 
 /* Loose Coupons Grid */
