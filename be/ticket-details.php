@@ -22,9 +22,9 @@ if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $date)) {
     $date = date('Y-m-d', strtotime($date));
 }
 
-// 1. Fetch available results for this date (Prefer non-empty result_number)
+// 1. Fetch available results for this date (Source of truth is Game ID 3 which contains the full 2-digit number)
 $results_map = [];
-$res_query = "SELECT time_slot_id, game_type_id, result_number FROM results WHERE result_date = '$date' AND result_number IS NOT NULL AND result_number != ''";
+$res_query = "SELECT time_slot_id, game_type_id, result_number FROM results WHERE result_date = '$date' AND game_id = 3 AND result_number IS NOT NULL AND result_number != ''";
 $res_sql = mysqli_query($conn, $res_query);
 if ($res_sql) {
     while ($r = mysqli_fetch_assoc($res_sql)) {
@@ -84,8 +84,11 @@ while ($row = mysqli_fetch_assoc($result)) {
         for ($i = 0; $i <= 9; $i++) {
             $num = $i . $n;
             $win_amt = 0;
-            if ($win_no !== null && $num == $win_no) {
-                $win_amt = $part_amount * 90;
+            if ($win_no !== null) {
+                // Numeric comparison to handle "05" vs 5 etc.
+                if ((int) $win_no == (int) $num) {
+                    $win_amt = $part_amount * 90;
+                }
             }
             $tickets_to_add[] = [
                 'number' => $num,
@@ -105,12 +108,17 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         $win_amt = 0;
         if ($win_no !== null) {
+            $win_no_int = (int) $win_no;
+            $selected_n_int = (int) $n;
+
             if ($row['game_id'] == 1) {
-                if (strlen($win_no) == 2 && substr($win_no, 0, 1) == $n) {
+                // Side A (Tens digit): Result 53 / 10 = 5.3 -> floor is 5
+                if ((int) floor($win_no_int / 10) === $selected_n_int) {
                     $win_amt = ($row['amount'] / 10) * 90;
                 }
             } else if ($row['game_id'] == 3) {
-                if ($n == $win_no) {
+                // Double: Full 2-digit match
+                if ($win_no_int === $selected_n_int) {
                     $win_amt = $row['amount'] * 90;
                 }
             }
