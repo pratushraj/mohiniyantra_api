@@ -100,13 +100,13 @@ while ($row = mysqli_fetch_assoc($result)) {
     } else {
         $display_number = $n;
         if ($row['game_id'] == 1) {
-            $display_number = "0$n-9$n";
+            $display_number = $n . "0-" . $n . "9";
         }
 
         $win_amt = 0;
         if ($win_no !== null) {
             if ($row['game_id'] == 1) {
-                if (strlen($win_no) == 2 && substr($win_no, 1, 1) == $n) {
+                if (strlen($win_no) == 2 && substr($win_no, 0, 1) == $n) {
                     $win_amt = ($row['amount'] / 10) * 90;
                 }
             } else if ($row['game_id'] == 3) {
