@@ -1,5 +1,5 @@
 // Centralized Configuration
-const BASE_URL = "http://localhost/mohini/public_html/be";
+const BASE_URL = "https://apiyantra.rajaranimohiniyantra.com/be";
 
 const CONFIG = {
     BASE_URL: BASE_URL,

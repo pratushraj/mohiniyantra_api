@@ -2,7 +2,6 @@
 require_once('./connection.php');
 
 header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST");
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     http_response_code(405);
@@ -26,7 +25,8 @@ $inputPass = mysqli_real_escape_string($conn, $data['password']);
 
 $cacheCode = $data['cache_code'] ?? null; // Optional cache code for checking if user is already logged in
 
-function generateRandomPassword($length = 32) {
+function generateRandomPassword($length = 32)
+{
     // Characters to use in password
     $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}<>?';
     $charactersLength = strlen($characters);
@@ -39,7 +39,7 @@ function generateRandomPassword($length = 32) {
 
     return $password;
 }
- // 32-character password
+// 32-character password
 
 
 // Fetch the user from the database
@@ -62,7 +62,7 @@ if (mysqli_num_rows($result) > 0) {
         } else {
             $cacheGenerated = generateRandomPassword(32);
             $userId = $user['id'];
-            $updateUserSql = mysqli_query($conn, "UPDATE users SET is_logged_in = 1, cache  = '".$cacheGenerated."' WHERE id = $userId");
+            $updateUserSql = mysqli_query($conn, "UPDATE users SET is_logged_in = 1, cache  = '" . $cacheGenerated . "' WHERE id = $userId");
             http_response_code(200); // OK
             echo json_encode([
                 'status' => true,

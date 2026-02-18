@@ -9,7 +9,7 @@ $currentGameTimeSlotRes = mysqli_fetch_assoc(mysqli_query($conn, "
 SELECT * FROM time_slots WHERE time > '$currentTime' LIMIT 1;"));
 
 if (isset($currentGameTimeSlotRes) && !empty($currentGameTimeSlotRes)) {
-    $gameDetails['end_time']       = $currentGameTimeSlotRes['time'];
+    $gameDetails['end_time'] = $currentGameTimeSlotRes['time'];
     $allowedTimeStamp = date('Y-m-d H:i:s', strtotime($gameDetails['end_time'] . ' -1 minute'));
 } else {
     $allowedTimeStamp = date('Y-m-d H:i:s', strtotime('08:29:00' . ' +1 day'));
@@ -17,10 +17,9 @@ if (isset($currentGameTimeSlotRes) && !empty($currentGameTimeSlotRes)) {
 // Current running game
 
 header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST");
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    http_response_code(405); // Method not allowed
+    http_response_code(405);
     echo json_encode(['status' => false, 'msg' => 'Method Not Allowed']);
     exit;
 }
@@ -65,7 +64,7 @@ foreach ($data['tickets'] as $ticket) {
     $selected_number = $ticket['number'];
     $ticketQty = $ticket['qty'];
     $rate = $ticketPriceRes[$ticket['game_id']];
-    if($game_id == 1 || $game_id == 2){
+    if ($game_id == 1 || $game_id == 2) {
         $amount = $ticket['qty'] * ($ticketPriceRes[$ticket['game_id']] * 10);
     } else {
         $amount = $ticket['qty'] * $ticketPriceRes[$ticket['game_id']];
