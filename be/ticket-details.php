@@ -22,10 +22,17 @@ if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $date)) {
     $date = date('Y-m-d', strtotime($date));
 }
 
-// Fetch tickets joined with time_slots and game_types
-// PRIMARY SORT: Time DESC (Latest first)
-// SECONDARY: Purchase Date DESC (Latest purchase first)
-// TERTIARY: Game ID DESC (Preference to Double/Bulk)
+// 1. Fetch available results for this date to display in report
+$results_map = [];
+$res_query = "SELECT time_slot_id, game_type_id, result_number FROM results WHERE result_date = '$date'";
+$res_sql = mysqli_query($conn, $res_query);
+if ($res_sql) {
+    while ($r = mysqli_fetch_assoc($res_sql)) {
+        $results_map[$r['time_slot_id']][$r['game_type_id']] = $r['result_number'];
+    }
+}
+
+// 2. Fetch tickets joined with time_slots and game_types
 $sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code 
         FROM tickets t
         LEFT JOIN time_slots ts ON t.time_slot_id = ts.time_slot_id
@@ -48,17 +55,22 @@ while ($row = mysqli_fetch_assoc($result)) {
     $event_code = $row['ticket_date'] . ' ' . $draw_time;
     $purchase_time = $row['purchase_date'];
     $gt_id = $row['game_type_id'];
+    $ts_id = $row['time_slot_id'];
 
     // Create a unique key for each batch (Time + Exact Purchase Time + Game Type)
     $batch_key = $event_code . '_' . $purchase_time . '_' . $gt_id;
 
     if (!isset($grouped_data[$batch_key])) {
+        // Find result if published
+        $winning_no = isset($results_map[$ts_id][$gt_id]) ? $results_map[$ts_id][$gt_id] : null;
+
         $grouped_data[$batch_key] = [
             'gifteventcode' => $event_code,
             'draw_time' => $draw_time,
             'purchase_date' => $purchase_time,
             'game_type_code' => $row['game_type_code'],
             'game_type_id' => $gt_id,
+            'winning_number' => $winning_no, // Added result
             'tickets' => []
         ];
     }

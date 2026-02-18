@@ -182,9 +182,11 @@
                             giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are 0</td>`;
                             tbody.appendChild(giftPtsTr);
 
+                            // Gift Code Row (Shows result if published)
                             const giftCodeTr = document.createElement('tr');
                             giftCodeTr.style.backgroundColor = "var(--header-bg)";
-                            giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: --</td>`;
+                            const winDisplay = (batch.winning_number !== null && batch.winning_number !== undefined) ? (batch.game_type_code + batch.winning_number) : '--';
+                            giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: ${winDisplay}</td>`;
                             tbody.appendChild(giftCodeTr);
                         }
                     });
