@@ -127,55 +127,53 @@
                     let globalIdx = 1;
                     let hasShownAny = false;
 
-                    json.data.forEach(event => {
+                    json.data.forEach(batch => {
                         // Filter by time range
-                        const drawTime = event.draw_time; // e.g., "12:30"
+                        const drawTime = batch.draw_time; // e.g., "12:00"
                         const isVisible = isNoTimeFilter || (drawTime >= fromTime && drawTime <= toTime);
 
                         if (isVisible) {
                             hasShownAny = true;
 
-                            let eventTotalPoints = 0;
-                            let eventShown = false;
+                            let batchTotalPoints = 0;
+                            let batchShown = false;
 
-                            event.game_types.forEach(gameType => {
-                                gameType.tickets.forEach(ticket => {
-                                    const tr = document.createElement('tr');
+                            batch.tickets.forEach(ticket => {
+                                const tr = document.createElement('tr');
 
-                                    let selectedDisplay = "";
-                                    if (ticket.number.includes('-')) {
-                                        const parts = ticket.number.split('-');
-                                        selectedDisplay = `${gameType.game_type_code}${parts[0]} - ${gameType.game_type_code}${parts[1]}`;
-                                    } else {
-                                        selectedDisplay = `${gameType.game_type_code}${ticket.number}`;
-                                    }
+                                let selectedDisplay = "";
+                                if (ticket.number.includes('-')) {
+                                    const parts = ticket.number.split('-');
+                                    selectedDisplay = `${batch.game_type_code}${parts[0]} - ${batch.game_type_code}${parts[1]}`;
+                                } else {
+                                    selectedDisplay = `${batch.game_type_code}${ticket.number}`;
+                                }
 
-                                    eventTotalPoints += parseFloat(ticket.amount);
+                                batchTotalPoints += parseFloat(ticket.amount);
 
-                                    if (!eventShown) {
-                                        tr.innerHTML = `
-                                            <td>${globalIdx++}</td>
-                                            <td>${event.gifteventcode}</td>
-                                            <td>${selectedDisplay}</td>
-                                            <td>${ticket.qty}</td>
-                                        `;
-                                        eventShown = true;
-                                    } else {
-                                        tr.innerHTML = `
-                                            <td></td>
-                                            <td></td>
-                                            <td>${selectedDisplay}</td>
-                                            <td>${ticket.qty}</td>
-                                        `;
-                                    }
-                                    tbody.appendChild(tr);
-                                });
+                                if (!batchShown) {
+                                    tr.innerHTML = `
+                                        <td>${globalIdx++}</td>
+                                        <td>${batch.gifteventcode}</td>
+                                        <td>${selectedDisplay}</td>
+                                        <td>${ticket.qty}</td>
+                                    `;
+                                    batchShown = true;
+                                } else {
+                                    tr.innerHTML = `
+                                        <td></td>
+                                        <td></td>
+                                        <td>${selectedDisplay}</td>
+                                        <td>${ticket.qty}</td>
+                                    `;
+                                }
+                                tbody.appendChild(tr);
                             });
 
-                            // Total Points Row for this entire event (Time slot)
+                            // Total Points Row for this specific purchase/batch
                             const totalTr = document.createElement('tr');
                             totalTr.style.backgroundColor = "var(--header-bg)";
-                            totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points: ${eventTotalPoints.toFixed(3)}</td>`;
+                            totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points (${batch.game_type_code}): ${batchTotalPoints.toFixed(3)}</td>`;
                             tbody.appendChild(totalTr);
 
                             // Gift Rows
