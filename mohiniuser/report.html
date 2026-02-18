@@ -127,19 +127,19 @@
                     let globalIdx = 1;
                     let hasShownAny = false;
 
-                    json.data.forEach(gameType => {
-                        gameType.events.forEach(event => {
-                            // Filter by time range
-                            const drawTime = event.draw_time; // e.g., "09:30"
-                            const isVisible = isNoTimeFilter || (drawTime >= fromTime && drawTime <= toTime);
+                    json.data.forEach(event => {
+                        // Filter by time range
+                        const drawTime = event.draw_time; // e.g., "12:30"
+                        const isVisible = isNoTimeFilter || (drawTime >= fromTime && drawTime <= toTime);
 
-                            if (isVisible) {
-                                hasShownAny = true;
+                        if (isVisible) {
+                            hasShownAny = true;
 
-                                let eventTotalPoints = 0;
-                                let eventShown = false;
+                            let eventTotalPoints = 0;
+                            let eventShown = false;
 
-                                event.tickets.forEach(ticket => {
+                            event.game_types.forEach(gameType => {
+                                gameType.tickets.forEach(ticket => {
                                     const tr = document.createElement('tr');
 
                                     let selectedDisplay = "";
@@ -170,25 +170,25 @@
                                     }
                                     tbody.appendChild(tr);
                                 });
+                            });
 
-                                // Total Points Row for this event
-                                const totalTr = document.createElement('tr');
-                                totalTr.style.backgroundColor = "var(--header-bg)";
-                                totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points (${gameType.game_type_code}): ${eventTotalPoints.toFixed(3)}</td>`;
-                                tbody.appendChild(totalTr);
+                            // Total Points Row for this entire event (Time slot)
+                            const totalTr = document.createElement('tr');
+                            totalTr.style.backgroundColor = "var(--header-bg)";
+                            totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points: ${eventTotalPoints.toFixed(3)}</td>`;
+                            tbody.appendChild(totalTr);
 
-                                // Gift Rows (kept as placeholders as per original code)
-                                const giftPtsTr = document.createElement('tr');
-                                giftPtsTr.style.backgroundColor = "var(--header-bg)";
-                                giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are 0</td>`;
-                                tbody.appendChild(giftPtsTr);
+                            // Gift Rows
+                            const giftPtsTr = document.createElement('tr');
+                            giftPtsTr.style.backgroundColor = "var(--header-bg)";
+                            giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are 0</td>`;
+                            tbody.appendChild(giftPtsTr);
 
-                                const giftCodeTr = document.createElement('tr');
-                                giftCodeTr.style.backgroundColor = "var(--header-bg)";
-                                giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: --</td>`;
-                                tbody.appendChild(giftCodeTr);
-                            }
-                        });
+                            const giftCodeTr = document.createElement('tr');
+                            giftCodeTr.style.backgroundColor = "var(--header-bg)";
+                            giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: --</td>`;
+                            tbody.appendChild(giftCodeTr);
+                        }
                     });
 
                     if (!hasShownAny) {
