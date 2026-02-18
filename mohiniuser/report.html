@@ -176,10 +176,11 @@
                             totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points (${batch.game_type_code}): ${batchTotalPoints.toFixed(3)}</td>`;
                             tbody.appendChild(totalTr);
 
-                            // Gift Rows
+                            // Gift Points Row (Winning Amount)
                             const giftPtsTr = document.createElement('tr');
                             giftPtsTr.style.backgroundColor = "var(--header-bg)";
-                            giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are 0</td>`;
+                            const pointsDisplay = (batch.batch_winning_amount > 0) ? batch.batch_winning_amount.toFixed(2) : '0';
+                            giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are ${pointsDisplay}</td>`;
                             tbody.appendChild(giftPtsTr);
 
                             // Gift Code Row (Shows result if published)

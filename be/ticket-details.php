@@ -57,7 +57,6 @@ while ($row = mysqli_fetch_assoc($result)) {
     $gt_id = $row['game_type_id'];
     $ts_id = $row['time_slot_id'];
 
-    // Create a unique key for each batch (Time + Exact Purchase Time + Game Type)
     $batch_key = $event_code . '_' . $purchase_time . '_' . $gt_id;
 
     if (!isset($grouped_data[$batch_key])) {
@@ -70,26 +69,37 @@ while ($row = mysqli_fetch_assoc($result)) {
             'purchase_date' => $purchase_time,
             'game_type_code' => $row['game_type_code'],
             'game_type_id' => $gt_id,
-            'winning_number' => $winning_no, // Added result
+            'winning_number' => $winning_no,
+            'batch_winning_amount' => 0, // Track total win for this batch
             'tickets' => []
         ];
     }
 
     $n = $row['selected_number'];
     $tickets_to_add = [];
+    $win_no = $grouped_data[$batch_key]['winning_number'];
 
     if ($row['game_id'] == 2) {
         // Bulk B: Expansion
         $part_amount = $row['amount'] / 10;
         for ($i = 0; $i <= 9; $i++) {
             $num = $i . $n;
+
+            // Winning check
+            $win_amt = 0;
+            if ($win_no !== null && $num == $win_no) {
+                $win_amt = $part_amount * 90;
+            }
+
             $tickets_to_add[] = [
                 'number' => $num,
                 'qty' => $row['qty'],
                 'amount' => $part_amount,
                 'rate' => $row['rate'],
-                'game_id' => $row['game_id']
+                'game_id' => $row['game_id'],
+                'win_amount' => $win_amt
             ];
+            $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
         }
     } else {
         // Bulk A or Loose
@@ -97,13 +107,32 @@ while ($row = mysqli_fetch_assoc($result)) {
         if ($row['game_id'] == 1) {
             $display_number = "0$n-9$n";
         }
+
+        // Winning check (Bulk A covers multiple numbers, we check which one wins)
+        $win_amt = 0;
+        if ($win_no !== null) {
+            if ($row['game_id'] == 1) {
+                // If the second digit matches the selected index $n
+                if (strlen($win_no) == 2 && substr($win_no, 1, 1) == $n) {
+                    $win_amt = $row['amount'] / 10 * 90; // total / 10 * 90 = total * 9
+                }
+            } else if ($row['game_id'] == 3) {
+                // Loose:Direct match
+                if ($n == $win_no) {
+                    $win_amt = $row['amount'] * 90;
+                }
+            }
+        }
+
         $tickets_to_add[] = [
             'number' => $display_number,
             'qty' => $row['qty'],
             'amount' => $row['amount'],
             'rate' => $row['rate'],
-            'game_id' => $row['game_id']
+            'game_id' => $row['game_id'],
+            'win_amount' => $win_amt
         ];
+        $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
     }
 
     foreach ($tickets_to_add as $t) {
