@@ -2,7 +2,6 @@
 require_once('./connection.php');
 
 header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST, GET");
 
 // Get input data
 $input = file_get_contents("php://input");
@@ -24,12 +23,13 @@ if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $date)) {
 }
 
 // Fetch tickets joined with time_slots and game_types
+// Grouped by game_type first, then purchase_date (DESC), then draw time
 $sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code 
         FROM tickets t
         LEFT JOIN time_slots ts ON t.time_slot_id = ts.time_slot_id
         LEFT JOIN game_types gt ON t.game_type_id = gt.game_type_id
         WHERE t.user_id = '$user_id' AND t.ticket_date = '$date' 
-        ORDER BY t.purchase_date DESC, ts.time ASC, t.game_id ASC, t.game_type_id ASC";
+        ORDER BY t.game_type_id ASC, t.purchase_date DESC, ts.time ASC";
 
 $result = mysqli_query($conn, $sql);
 
@@ -39,98 +39,91 @@ if (!$result) {
     exit;
 }
 
-$purchases = [];
+$grouped_data = [];
 
 while ($row = mysqli_fetch_assoc($result)) {
-    $p_date = $row['purchase_date'];
+    $gt_id = $row['game_type_id'];
+    $gt_code = $row['game_type_code'];
+    $purchase_date = $row['purchase_date'];
+    $draw_time = substr($row['draw_time'], 0, 5); // 09:30:00 -> 09:30
+    $event_code = $row['ticket_date'] . ' ' . $draw_time;
 
-    // Format time to show range (e.g., 12:00 to 13:00)
-    $ts = strtotime($row['draw_time']);
-    $to_time = date('H:i', $ts);
-    $from_time = date('H:i', strtotime('-1 hour', $ts));
-    $time_range = $from_time . ' to ' . $to_time;
+    if (!isset($grouped_data[$gt_id])) {
+        $grouped_data[$gt_id] = [
+            'game_type_id' => $gt_id,
+            'game_type_code' => $gt_code,
+            'purchases' => []
+        ];
+    }
 
-    $event_code = $row['ticket_date'] . ' ' . $to_time;
-    $game_key = $row['game_id'] . '_' . $row['game_type_id'];
-
-    if (!isset($purchases[$p_date])) {
-        $purchases[$p_date] = [
-            'purchase_date' => $p_date,
-            'user_id' => $row['user_id'],
-            'total_purchase_amount' => 0,
+    if (!isset($grouped_data[$gt_id]['purchases'][$purchase_date])) {
+        $grouped_data[$gt_id]['purchases'][$purchase_date] = [
+            'purchase_date' => $purchase_date,
             'events' => []
         ];
     }
 
-    if (!isset($purchases[$p_date]['events'][$event_code])) {
-        $purchases[$p_date]['events'][$event_code] = [
+    if (!isset($grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code])) {
+        $grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code] = [
             'gifteventcode' => $event_code,
-            'ticket_date' => $row['ticket_date'],
-            'draw_time' => $to_time,
-            'time_range' => $time_range,
-            'time_slot_id' => $row['time_slot_id'],
-            'numberselected' => []
+            'draw_time' => $draw_time,
+            'event_total_amount' => 0,
+            'tickets' => []
         ];
     }
 
-    if (!isset($purchases[$p_date]['events'][$event_code]['numberselected'][$game_key])) {
-        $purchases[$p_date]['events'][$event_code]['numberselected'][$game_key] = [
-            'game_type' => $row['game_type_id'],
-            'game_type_code' => $row['game_type_code'],
-            'game_id' => $row['game_id'],
-            'totalamount' => 0,
-            'selectednumbers' => []
-        ];
-    }
-
-    // Map and Add ticket detail
+    // Process tickets according to game_id
     $n = $row['selected_number'];
+    $tickets_to_add = [];
 
     if ($row['game_id'] == 2) {
-        // Bulk B: Return 10 separate entries in the array
+        // Bulk B: Expansion
         for ($i = 0; $i <= 9; $i++) {
-            $num = $i . $n; // e.g., 0X, 1X, 2X...
-            $purchases[$p_date]['events'][$event_code]['numberselected'][$game_key]['selectednumbers'][] = [
+            $num = $i . $n;
+            $tickets_to_add[] = [
                 'number' => $num,
                 'qty' => $row['qty'],
                 'amount' => $row['amount'],
-                'rate' => $row['rate']
+                'rate' => $row['rate'],
+                'game_id' => $row['game_id']
             ];
         }
     } else {
-        // Bulk A (game_id 1) or Loose (game_id 3)
-        $display_number = $row['selected_number'];
+        // Bulk A or Loose
+        $display_number = $n;
         if ($row['game_id'] == 1) {
             $display_number = "0$n-9$n";
         }
-
-        $purchases[$p_date]['events'][$event_code]['numberselected'][$game_key]['selectednumbers'][] = [
+        $tickets_to_add[] = [
             'number' => $display_number,
             'qty' => $row['qty'],
             'amount' => $row['amount'],
-            'rate' => $row['rate']
+            'rate' => $row['rate'],
+            'game_id' => $row['game_id']
         ];
     }
 
-    // Update totals
-    $purchases[$p_date]['events'][$event_code]['numberselected'][$game_key]['totalamount'] += $row['amount'];
-    $purchases[$p_date]['total_purchase_amount'] += $row['amount'];
+    foreach ($tickets_to_add as $t) {
+        $grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code]['tickets'][] = $t;
+    }
+
+    $grouped_data[$gt_id]['purchases'][$purchase_date]['events'][$event_code]['event_total_amount'] += $row['amount'];
 }
 
-// Re-format to indexed arrays instead of associative keys for JSON compatibility
+// Convert to indexed array for response
 $final_output = [];
-foreach ($purchases as $p) {
-    $formatted_events = [];
-    foreach ($p['events'] as $e) {
-        $formatted_games = [];
-        foreach ($e['numberselected'] as $g) {
-            $formatted_games[] = $g;
+foreach ($grouped_data as $gt) {
+    $formatted_purchases = [];
+    foreach ($gt['purchases'] as $p) {
+        $formatted_events = [];
+        foreach ($p['events'] as $e) {
+            $formatted_events[] = $e;
         }
-        $e['numberselected'] = $formatted_games;
-        $formatted_events[] = $e;
+        $p['events'] = $formatted_events;
+        $formatted_purchases[] = $p;
     }
-    $p['events'] = $formatted_events;
-    $final_output[] = $p;
+    $gt['purchases'] = $formatted_purchases;
+    $final_output[] = $gt;
 }
 
 if (empty($final_output)) {
