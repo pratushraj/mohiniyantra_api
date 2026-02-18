@@ -77,13 +77,14 @@ while ($row = mysqli_fetch_assoc($result)) {
     $tickets_to_add = [];
 
     if ($row['game_id'] == 2) {
-        // Bulk B: Expansion
+        // Bulk B: Expansion - Divide amount by 10 for each part to keep total correct
+        $part_amount = $row['amount'] / 10;
         for ($i = 0; $i <= 9; $i++) {
             $num = $i . $n;
             $tickets_to_add[] = [
                 'number' => $num,
                 'qty' => $row['qty'],
-                'amount' => $row['amount'],
+                'amount' => $part_amount,
                 'rate' => $row['rate'],
                 'game_id' => $row['game_id']
             ];
