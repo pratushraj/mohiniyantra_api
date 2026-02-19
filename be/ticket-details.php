@@ -105,9 +105,9 @@ while ($row = mysqli_fetch_assoc($result)) {
             }
 
             if ($has_won) {
-                // Single Game payout is 10x the total amount spent on the group
-                // Since each expansion ticket is 1/10th of the total amount, we multiply by 100
-                $win_amt = (double) $part_amount * 100;
+                // Each expanded ticket gets 1/10 of the total qty win.
+                // Total group win for 1 qty = 100.
+                $win_amt = $qty * 10;
             }
 
             $tickets_to_add[] = [
@@ -143,14 +143,14 @@ while ($row = mysqli_fetch_assoc($result)) {
                 }
             }
             if ($has_won)
-                $win_amt = (double) $row['amount'] * 10;
+                $win_amt = $qty * 100;
 
         } else if ($row['game_id'] == 3) {
             // Double Game
             $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
             if ($double_res !== null && (int) $double_res === (int) $n) {
                 $has_won = true;
-                $win_amt = (double) $row['amount'] * 90; // Standard 90x payout
+                $win_amt = $qty * 900; // Standard 90x payout based on qty
             }
         }
 
