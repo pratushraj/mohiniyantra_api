@@ -22,13 +22,14 @@ if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $date)) {
     $date = date('Y-m-d', strtotime($date));
 }
 
-// 1. Fetch available results for this date (Source of truth is Game ID 3 which contains the full 2-digit number)
+// 1. Fetch available results for this date (All game types including Single and Double)
 $results_map = [];
-$res_query = "SELECT time_slot_id, game_type_id, result_number FROM results WHERE result_date = '$date' AND game_id = 3 AND result_number IS NOT NULL AND result_number != ''";
+$res_query = "SELECT time_slot_id, game_type_id, game_id, result_number FROM results WHERE result_date = '$date' AND result_number IS NOT NULL AND result_number != ''";
 $res_sql = mysqli_query($conn, $res_query);
 if ($res_sql) {
     while ($r = mysqli_fetch_assoc($res_sql)) {
-        $results_map[$r['time_slot_id']][$r['game_type_id']] = $r['result_number'];
+        // Store by slot, type, and game for precise matching
+        $results_map[$r['time_slot_id']][$r['game_type_id']][$r['game_id']] = $r['result_number'];
     }
 }
 
@@ -60,8 +61,10 @@ while ($row = mysqli_fetch_assoc($result)) {
     $batch_key = $event_code . '_' . $purchase_time . '_' . $gt_id;
 
     if (!isset($grouped_data[$batch_key])) {
-        // Find result if published
-        $winning_no = isset($results_map[$ts_id][$gt_id]) ? $results_map[$ts_id][$gt_id] : null;
+        // We no longer store a single 'winning_number' globally for the batch 
+        // as each game_id (1, 2, 3) has its own winning criteria.
+        // But for the report footer "Gift Code", we show the Double result (Game 3)
+        $batch_double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
 
         $grouped_data[$batch_key] = [
             'gifteventcode' => $event_code,
@@ -69,7 +72,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             'purchase_date' => $purchase_time,
             'game_type_code' => $row['game_type_code'],
             'game_type_id' => $gt_id,
-            'winning_number' => $winning_no,
+            'winning_number' => $batch_double_res, // For footer display
             'batch_winning_amount' => 0,
             'tickets' => []
         ];
@@ -77,19 +80,37 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     $n = $row['selected_number'];
     $tickets_to_add = [];
-    $win_no = $grouped_data[$batch_key]['winning_number'];
+    $qty = (int) $row['qty'];
 
     if ($row['game_id'] == 2) {
+        // Side B (Units digit)
+        // Check if there's a direct Single result or a Double result to slice
+        $single_res = isset($results_map[$ts_id][$gt_id][2]) ? $results_map[$ts_id][$gt_id][2] : null;
+        $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
+
         $part_amount = $row['amount'] / 10;
         for ($i = 0; $i <= 9; $i++) {
             $num = $i . $n;
             $win_amt = 0;
-            if ($win_no !== null) {
-                // Numeric comparison to handle "05" vs 5 etc.
-                if ((int) $win_no == (int) $num) {
-                    $win_amt = $part_amount * 90;
+
+            // Winning check: Matches direct Single result OR matches second digit of Double result
+            $has_won = false;
+            if ($single_res !== null && (int) $single_res === (int) $n) {
+                $has_won = true;
+            } else if ($double_res !== null) {
+                $double_int = (int) $double_res;
+                if (($double_int % 10) === (int) $n) {
+                    $has_won = true;
                 }
             }
+
+            if ($has_won) {
+                // Based on user data: 10 qty wins 1000, 20 qty wins 2000. Multiplier = 100.
+                $win_amt = $qty * 100 / 10; // Divided by 10 because Side B expansion splits qty
+                // Actually, if they bought 1 qty, they win 100.
+                $win_amt = $qty * 10;
+            }
+
             $tickets_to_add[] = [
                 'number' => $num,
                 'qty' => $row['qty'],
@@ -107,20 +128,30 @@ while ($row = mysqli_fetch_assoc($result)) {
         }
 
         $win_amt = 0;
-        if ($win_no !== null) {
-            $win_no_int = (int) $win_no;
-            $selected_n_int = (int) $n;
+        $has_won = false;
 
-            if ($row['game_id'] == 1) {
-                // Side A (Tens digit): Result 53 / 10 = 5.3 -> floor is 5
-                if ((int) floor($win_no_int / 10) === $selected_n_int) {
-                    $win_amt = ($row['amount'] / 10) * 90;
+        if ($row['game_id'] == 1) {
+            // Side A (Tens digit)
+            $single_res = isset($results_map[$ts_id][$gt_id][1]) ? $results_map[$ts_id][$gt_id][1] : null;
+            $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
+
+            if ($single_res !== null && (int) $single_res === (int) $n) {
+                $has_won = true;
+            } else if ($double_res !== null) {
+                $double_int = (int) $double_res;
+                if ((int) floor($double_int / 10) === (int) $n) {
+                    $has_won = true;
                 }
-            } else if ($row['game_id'] == 3) {
-                // Double: Full 2-digit match
-                if ($win_no_int === $selected_n_int) {
-                    $win_amt = $row['amount'] * 90;
-                }
+            }
+            if ($has_won)
+                $win_amt = $qty * 100;
+
+        } else if ($row['game_id'] == 3) {
+            // Double Game
+            $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
+            if ($double_res !== null && (int) $double_res === (int) $n) {
+                $has_won = true;
+                $win_amt = $qty * 900; // Standard 90x payout
             }
         }
 
