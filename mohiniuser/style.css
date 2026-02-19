@@ -147,8 +147,8 @@ body {
 }
 
 .tab-bulk-a {
-    background-color: var(--card-bg);
-    color: var(--text-color);
+    background-color: var(--nav-blue);
+    /* color: var(--text-color); */
 }
 
 .tab-bulk-b {
