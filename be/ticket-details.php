@@ -33,6 +33,17 @@ if ($res_sql) {
     }
 }
 
+// 1.1 Fetch already calculated winnings from user_winnings table (Source of truth for report)
+$winnings_map = [];
+$win_query = "SELECT time_slot_id, game_type_id, game_id, amount FROM user_winnings WHERE user_id = '$user_id' AND winning_date = '$date'";
+$win_sql = mysqli_query($conn, $win_query);
+if ($win_sql) {
+    while ($w = mysqli_fetch_assoc($win_sql)) {
+        // Map winning total per batch (Slot + Type + Game)
+        $winnings_map[$w['time_slot_id']][$w['game_type_id']][$w['game_id']] = (double) $w['amount'];
+    }
+}
+
 // 2. Fetch tickets
 $sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code 
         FROM tickets t
@@ -61,10 +72,16 @@ while ($row = mysqli_fetch_assoc($result)) {
     $batch_key = $event_code . '_' . $purchase_time . '_' . $gt_id;
 
     if (!isset($grouped_data[$batch_key])) {
-        // We no longer store a single 'winning_number' globally for the batch 
-        // as each game_id (1, 2, 3) has its own winning criteria.
-        // But for the report footer "Gift Code", we show the Double result (Game 3)
+        // We show the Double result (Game 3) for the footer display
         $batch_double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
+
+        // Sum winnings for this batch from user_winnings table first
+        $batch_win_total = 0;
+        if (isset($winnings_map[$ts_id][$gt_id])) {
+            foreach ($winnings_map[$ts_id][$gt_id] as $game_total) {
+                $batch_win_total += $game_total;
+            }
+        }
 
         $grouped_data[$batch_key] = [
             'gifteventcode' => $event_code,
@@ -73,8 +90,9 @@ while ($row = mysqli_fetch_assoc($result)) {
             'game_type_code' => $row['game_type_code'],
             'game_type_id' => $gt_id,
             'winning_number' => $batch_double_res, // For footer display
-            'batch_winning_amount' => 0,
-            'tickets' => []
+            'batch_winning_amount' => $batch_win_total, // Use total from user_winnings
+            'tickets' => [],
+            'winnings_source' => 'table' // Mark that we initialized from table
         ];
     }
 
@@ -118,7 +136,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                 'game_id' => $row['game_id'],
                 'win_amount' => $win_amt
             ];
-            $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
+            // Only calculate on-the-fly if no entry was found in user_winnings table for this batch
+            if (empty($winnings_map[$ts_id][$gt_id])) {
+                $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
+            }
         }
     } else {
         $display_number = $n;
@@ -162,7 +183,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             'game_id' => $row['game_id'],
             'win_amount' => $win_amt
         ];
-        $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
+
+        // Only calculate on-the-fly if no entry was found in user_winnings table for this batch
+        if (empty($winnings_map[$ts_id][$gt_id])) {
+            $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
+        }
     }
 
     foreach ($tickets_to_add as $t) {
