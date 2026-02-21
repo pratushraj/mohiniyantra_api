@@ -176,12 +176,21 @@
                             totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points (${batch.game_type_code}): ${batchTotalPoints.toFixed(3)}</td>`;
                             tbody.appendChild(totalTr);
 
-                            // Gift Points Row (Winning Amount)
-                            const giftPtsTr = document.createElement('tr');
-                            giftPtsTr.style.backgroundColor = "var(--header-bg)";
-                            const pointsDisplay = (batch.batch_winning_amount > 0) ? parseFloat(batch.batch_winning_amount).toFixed(2) : '0';
-                            giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are ${pointsDisplay}</td>`;
-                            tbody.appendChild(giftPtsTr);
+                            // Gift Points Row or Cancelled Row
+                            if (batch.is_cancelled) {
+                                const cancelTr = document.createElement('tr');
+                                cancelTr.style.backgroundColor = "var(--header-bg)";
+                                // Format cancel_time if available, otherwise use date
+                                let cancelDisplay = formatCancelTime(batch.cancel_time || batch.gifteventcode);
+                                cancelTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Event Cancled on: ${cancelDisplay}</td>`;
+                                tbody.appendChild(cancelTr);
+                            } else {
+                                const giftPtsTr = document.createElement('tr');
+                                giftPtsTr.style.backgroundColor = "var(--header-bg)";
+                                const pointsDisplay = (batch.batch_winning_amount > 0) ? parseFloat(batch.batch_winning_amount).toFixed(2) : '0';
+                                giftPtsTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift points are ${pointsDisplay}</td>`;
+                                tbody.appendChild(giftPtsTr);
+                            }
 
                             // Gift Code Row (Shows result if published)
                             const giftCodeTr = document.createElement('tr');
@@ -195,24 +204,73 @@
                     if (!hasShownAny) {
                         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No records found for the selected time range.</td></tr>`;
                     }
+
+                    // Calculate and show Total Summary
+                    let totalQty = 0;
+                    let totalPoints = 0;
+                    let totalGiftPoints = 0;
+                    let totalCancelPoints = 0;
+
+                    json.data.forEach(batch => {
+                        const drawTime = batch.draw_time;
+                        const isVisible = isNoTimeFilter || (drawTime >= fromTime && drawTime <= toTime);
+                        if (isVisible) {
+                            if (batch.is_cancelled) {
+                                totalCancelPoints += parseFloat(batch.cancel_amount || 0);
+                            } else {
+                                totalGiftPoints += parseFloat(batch.batch_winning_amount || 0);
+                            }
+                            batch.tickets.forEach(ticket => {
+                                totalQty += parseFloat(ticket.qty || 0);
+                                if (ticket.status != 0 && !batch.is_cancelled) {
+                                    totalPoints += parseFloat(ticket.amount || 0);
+                                }
+                            });
+                        }
+                    });
+
+                    const summaryDiv = document.getElementById('totalSummaryCont');
+                    if (summaryDiv) {
+                        summaryDiv.innerHTML = `
+                            <div style="background-color: #d16666; color: black; padding: 10px 20px; display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; border-top: 2px solid #000; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;">
+                                <span>Total Summary</span>
+                                <span>Qty-${totalQty.toFixed(0)}</span>
+                                <span>Points-${totalPoints.toFixed(2)}</span>
+                                <span>Gift Points-${totalGiftPoints.toFixed(2)}</span>
+                                <span>Cancel Points-${totalCancelPoints.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+
                 } else {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">${json.msg || 'No data found'}</td></tr>`;
+                    const summaryDiv = document.getElementById('totalSummaryCont');
+                    if (summaryDiv) summaryDiv.innerHTML = '';
                 }
 
-                // Empty rows for design
-                const rowsNeeded = 15 - tbody.children.length;
-                for (let i = 0; i < rowsNeeded; i++) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = '<td>&nbsp;</td><td></td><td></td><td></td>';
-                    tbody.appendChild(tr);
-                }
+                // Empty rows for design padding
+                const spacerTr = document.createElement('tr');
+                spacerTr.innerHTML = '<td colspan="4" style="height: 50px; border:none;">&nbsp;</td>';
+                tbody.appendChild(spacerTr);
 
             } catch (error) {
                 console.error("Report Fetch Error:", error);
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading report</td></tr>';
             }
         }
+
+        function formatCancelTime(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                const datePart = formatDate(d);
+                const timePart = String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
+                return datePart + " " + timePart;
+            } catch (e) { return dateStr; }
+        }
     </script>
+    <div id="totalSummaryCont"></div>
 </body>
 
 </html>

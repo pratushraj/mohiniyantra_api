@@ -100,9 +100,17 @@ while ($row = mysqli_fetch_assoc($result)) {
             'game_type_id' => $gt_id,
             'winning_number' => $batch_double_res, // For footer display
             'batch_winning_amount' => $batch_win_total, // Use total from user_winnings
+            'is_cancelled' => false,
+            'cancel_amount' => 0,
             'tickets' => [],
             'winnings_source' => 'table' // Mark that we initialized from table
         ];
+    }
+
+    if ($row['status'] == 0) {
+        $grouped_data[$batch_key]['is_cancelled'] = true;
+        // Use cancelled_at if available, otherwise fallback to purchase_date
+        $grouped_data[$batch_key]['cancel_time'] = (!empty($row['cancelled_at'])) ? $row['cancelled_at'] : $row['purchase_date'];
     }
 
     $n = $row['selected_number'];
@@ -205,7 +213,11 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 
     foreach ($tickets_to_add as $t) {
+        $t['status'] = $row['status'];
         $grouped_data[$batch_key]['tickets'][] = $t;
+        if ($row['status'] == 0) {
+            $grouped_data[$batch_key]['cancel_amount'] += $t['amount'];
+        }
     }
 }
 

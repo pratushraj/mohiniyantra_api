@@ -1,10 +1,19 @@
-<table id="singleGameB" class="table table-bordered table-sm text-center game-table tab-pane fade show" role="tabpanel" aria-labelledby="singleGameB-tab">
+<table id="singleGameB" class="table table-bordered table-sm text-center game-table tab-pane fade show" role="tabpanel"
+    aria-labelledby="singleGameB-tab">
     <thead class="table-header">
-    <tr class=" w-100 cont">
-                    <td colspan="4"><div class="prev_game_res_rm">NV11 || 14:30</div></td>
-                    <td colspan="4"><div class="prev_game_res_rr" id="">RR51 || 14:30</div></td>
-                    <td colspan="4"><div class="prev_game_res_ry" id="">RY97 || 14:30</div></td>
-                    <td colspan="4"><div class="prev_game_res_ch">CH64 || 14:30</div></td>
+        <tr class=" w-100 cont">
+            <td colspan="4">
+                <div class="prev_game_res_rm">NV11 || 14:30</div>
+            </td>
+            <td colspan="4">
+                <div class="prev_game_res_rr" id="">RR51 || 14:30</div>
+            </td>
+            <td colspan="4">
+                <div class="prev_game_res_ry" id="">RY97 || 14:30</div>
+            </td>
+            <td colspan="4">
+                <div class="prev_game_res_ch">CH64 || 14:30</div>
+            </td>
         </tr>
         <tr>
             <th>Product Group</th>

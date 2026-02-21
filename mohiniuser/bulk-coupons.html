@@ -145,6 +145,7 @@
                 const tr = document.createElement('tr');
                 tr.className = 'coupon-row';
                 tr.setAttribute('data-game-code', group.code);
+                tr.setAttribute('data-game-type-id', group.id);
                 tr.setAttribute('data-group-index', index);
 
                 let html = `<td>${group.name} ${group.code}</td><td>-</td>`;
@@ -319,10 +320,7 @@
             const rows = document.querySelectorAll('.coupon-row');
 
             rows.forEach(row => {
-                const code = row.getAttribute('data-game-code');
-                const gameTypeId = code.includes('RM') ? 1 :
-                    code.includes('RG') ? 2 :
-                        code.includes('RY') ? 3 : 4;
+                const gameTypeId = row.getAttribute('data-game-type-id');
 
                 row.querySelectorAll('.range-input').forEach(input => {
                     const qty = parseInt(input.value) || 0;

@@ -9,14 +9,14 @@ error_reporting(E_ALL);
 $today = date('Y-m-d');
 $timeNow = date('H:i:s');
 
-if(strtotime($timeNow) >= strtotime('22:30:00')  ) {
+if (strtotime($timeNow) >= strtotime('22:30:00')) {
     $today = date('Y-m-d', strtotime("+1 day"));
 }
 
 $currentGameTimeSlotRes = mysqli_fetch_assoc(mysqli_query($conn, "
             SELECT * FROM time_slots WHERE time > '$timeNow' LIMIT 1;"));
-    
-if( isset($currentGameTimeSlotRes) && !empty($currentGameTimeSlotRes) ) {
+
+if (isset($currentGameTimeSlotRes) && !empty($currentGameTimeSlotRes)) {
     $timeSlotNow = $currentGameTimeSlotRes['time_slot_id'];
 } else {
     $timeSlotNow = 1;
@@ -52,12 +52,12 @@ $totalSingleATicketCountPrice = 0;
 $totalSingleBTicketCountPrice = 0;
 $totalDoubleTicketCountPrice = 0;
 
-$fetchSql = mysqli_query($conn,"SELECT * FROM tickets WHERE user_id = $userId AND `status` = 1 AND ticket_date >= '$today' AND time_slot_id > '$lastTimeSlot'");
-while($fetchRes = mysqli_fetch_assoc($fetchSql)) {
+$fetchSql = mysqli_query($conn, "SELECT * FROM tickets WHERE user_id = $userId AND `status` = 1 AND ticket_date >= '$today' AND time_slot_id > '$lastTimeSlot'");
+while ($fetchRes = mysqli_fetch_assoc($fetchSql)) {
     $gameId = $fetchRes['game_id'];
     $ticketCount = $fetchRes['qty'];
     $ticketPrice = $fetchRes['amount'];
-    if( $gameId == 1 ) {
+    if ($gameId == 1) {
         $totalSingleATicketCount += $ticketCount;
         $totalSingleATicketCountPrice += $ticketPrice;
     } else if ($gameId == 2) {
@@ -85,17 +85,24 @@ $purchaseSummarySql = mysqli_query($conn, "
         ");
 
 
-// Delete from tickets table
-$query = "UPDATE tickets SET `status` = 0 WHERE user_id = ? AND ticket_date >= ? AND time_slot_id > ?";
-// $query = "DELETE FROM tickets WHERE user_id = ? AND ticket_date >= ? AND time_slot_id > ?";
+// Update tickets table - try to set cancelled_at if column exists
+$checkCol = mysqli_query($conn, "SHOW COLUMNS FROM tickets LIKE 'cancelled_at'");
+$hasCol = mysqli_num_rows($checkCol) > 0;
+
+if ($hasCol) {
+    $query = "UPDATE tickets SET `status` = 0, `cancelled_at` = NOW() WHERE user_id = ? AND ticket_date >= ? AND time_slot_id > ?";
+} else {
+    $query = "UPDATE tickets SET `status` = 0 WHERE user_id = ? AND ticket_date >= ? AND time_slot_id > ?";
+}
+
 $stmt = $conn->prepare($query);
 $stmt->bind_param("sss", $userId, $today, $lastTimeSlot);
 
 if ($stmt->execute()) {
-    echo json_encode(['status' => true, 'msg' => 'Tickets cancelled Points '.$totalTicketPrice.' refunded to wallet']);
+    echo json_encode(['status' => true, 'msg' => 'Tickets cancelled Points ' . $totalTicketPrice . ' refunded to wallet']);
 } else {
     http_response_code(500); // Internal Server Error
-    echo json_encode(['status' => false, 'msg' => 'Failed to delete upcoming tickets']);
+    echo json_encode(['status' => false, 'msg' => 'Failed to cancel upcoming tickets']);
 }
 
 // Close the statement and database connection

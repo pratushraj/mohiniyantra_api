@@ -53,7 +53,7 @@ async function syncSharedGroups() {
             SHARED_GROUPS.length = 0;
             json.data.forEach(game => {
                 SHARED_GROUPS.push({
-                    id: game.code, // RM, RG, RY, RS
+                    id: game.id, // Database game_type_id
                     name: game.name,
                     code: game.code,
                     time: '09:30'

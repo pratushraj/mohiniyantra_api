@@ -119,12 +119,23 @@
             });
         }
 
-        let currentTab = appConfig.groups[0].id;
+        let currentTab = null;
         const tabState = {};
-        appConfig.groups.forEach(g => tabState[g.id] = {});
+
+        function initTabSystem() {
+            if (appConfig.groups.length > 0) {
+                if (!currentTab) currentTab = appConfig.groups[0].id;
+                appConfig.groups.forEach(g => {
+                    if (!tabState[g.id]) tabState[g.id] = {};
+                });
+            }
+        }
 
         function saveTabState() {
-            if (!currentTab) return;
+            if (!currentTab) {
+                if (appConfig.groups.length > 0) currentTab = appConfig.groups[0].id;
+                else return;
+            }
             const data = {};
             document.querySelectorAll('.number-input').forEach(input => {
                 if (input.value) {
@@ -134,6 +145,14 @@
             });
             tabState[currentTab] = data;
         }
+
+        // Add to updateDynamicUI or a separate sync handler
+        const originalUpdateDynamicUI = (typeof updateDynamicUI === 'function') ? updateDynamicUI : null;
+        updateDynamicUI = function () {
+            if (originalUpdateDynamicUI) originalUpdateDynamicUI();
+            initTabSystem();
+        }
+        initTabSystem();
 
         function switchSubTab(element) {
             saveTabState();
@@ -159,7 +178,7 @@
             const tickets = [];
             SHARED_GROUPS.forEach(group => {
                 const data = tabState[group.id] || {};
-                const gameTypeId = group.code.includes('RM') ? 1 : group.code.includes('RG') ? 2 : group.code.includes('RY') ? 3 : 4;
+                const gameTypeId = group.id;
                 for (let num in data) {
                     tickets.push({
                         game_id: 3,
