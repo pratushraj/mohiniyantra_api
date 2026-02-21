@@ -100,31 +100,38 @@ while ($row = mysqli_fetch_assoc($result)) {
     $tickets_to_add = [];
     $qty = (int) $row['qty'];
 
-    if ($row['game_id'] == 2) {
-        // Side B (Units digit)
-        // Check if there's a direct Single result or a Double result to slice
-        $single_res = isset($results_map[$ts_id][$gt_id][2]) ? $results_map[$ts_id][$gt_id][2] : null;
+    $game_id = $row['game_id'];
+    if ($game_id == 1 || $game_id == 2) {
+        // Single Game A (Tens) or Single Game B (Units)
+        $single_res = isset($results_map[$ts_id][$gt_id][$game_id]) ? $results_map[$ts_id][$gt_id][$game_id] : null;
         $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
 
         $part_amount = $row['amount'] / 10;
+
+        // Loop from 0 to 9 to expand the Harf (Single digit) bet into 10 numbers
         for ($i = 0; $i <= 9; $i++) {
-            $num = $i . $n;
+            $num = ($game_id == 1) ? ($n . $i) : ($i . $n);
             $win_amt = 0;
 
-            // Winning check: Matches direct Single result OR matches second digit of Double result
             $has_won = false;
+            // Winning check: Matches direct Single result OR matches appropriate digit of Double result
             if ($single_res !== null && (int) $single_res === (int) $n) {
                 $has_won = true;
             } else if ($double_res !== null) {
                 $double_int = (int) $double_res;
-                if (($double_int % 10) === (int) $n) {
-                    $has_won = true;
+                if ($game_id == 1) { // Side A (Tens digit)
+                    if ((int) floor($double_int / 10) === (int) $n) {
+                        $has_won = true;
+                    }
+                } else { // Side B (Units digit)
+                    if (($double_int % 10) === (int) $n) {
+                        $has_won = true;
+                    }
                 }
             }
 
             if ($has_won) {
-                // Each expanded ticket gets 1/10 of the total qty win.
-                // Total group win for 1 qty = 100.
+                // Each expanded ticket gets 1/10 of the total qty win (Total harf win for 1 qty = 100)
                 $win_amt = $qty * 10;
             }
 
@@ -136,47 +143,22 @@ while ($row = mysqli_fetch_assoc($result)) {
                 'game_id' => $row['game_id'],
                 'win_amount' => $win_amt
             ];
+
             // Only calculate on-the-fly if no entry was found in user_winnings table for this batch
             if (empty($winnings_map[$ts_id][$gt_id])) {
                 $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
             }
         }
-    } else {
-        $display_number = $n;
-        if ($row['game_id'] == 1) {
-            $display_number = $n . "0-" . $n . "9";
-        }
-
+    } else if ($game_id == 3) {
+        // Double Game
+        $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
         $win_amt = 0;
-        $has_won = false;
-
-        if ($row['game_id'] == 1) {
-            // Side A (Tens digit)
-            $single_res = isset($results_map[$ts_id][$gt_id][1]) ? $results_map[$ts_id][$gt_id][1] : null;
-            $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
-
-            if ($single_res !== null && (int) $single_res === (int) $n) {
-                $has_won = true;
-            } else if ($double_res !== null) {
-                $double_int = (int) $double_res;
-                if ((int) floor($double_int / 10) === (int) $n) {
-                    $has_won = true;
-                }
-            }
-            if ($has_won)
-                $win_amt = $qty * 100;
-
-        } else if ($row['game_id'] == 3) {
-            // Double Game
-            $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
-            if ($double_res !== null && (int) $double_res === (int) $n) {
-                $has_won = true;
-                $win_amt = $qty * 900; // Standard 90x payout based on qty
-            }
+        if ($double_res !== null && (int) $double_res === (int) $n) {
+            $win_amt = $qty * 900; // Standard 90x payout based on qty
         }
 
         $tickets_to_add[] = [
-            'number' => $display_number,
+            'number' => $n,
             'qty' => $row['qty'],
             'amount' => $row['amount'],
             'rate' => $row['rate'],
@@ -184,7 +166,6 @@ while ($row = mysqli_fetch_assoc($result)) {
             'win_amount' => $win_amt
         ];
 
-        // Only calculate on-the-fly if no entry was found in user_winnings table for this batch
         if (empty($winnings_map[$ts_id][$gt_id])) {
             $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
         }
