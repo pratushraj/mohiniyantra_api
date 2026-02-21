@@ -83,11 +83,20 @@ while ($row = mysqli_fetch_assoc($result)) {
             }
         }
 
+        // Mapping based on user input: 1:KY, 2:BY, 3:RM, 4:DY
+        $code_mapping = [
+            1 => 'KY',
+            2 => 'BY',
+            3 => 'RM',
+            4 => 'DY'
+        ];
+        $gt_code = isset($code_mapping[$gt_id]) ? $code_mapping[$gt_id] : (isset($row['game_type_code']) ? $row['game_type_code'] : '??');
+
         $grouped_data[$batch_key] = [
             'gifteventcode' => $event_code,
             'draw_time' => $draw_time,
             'purchase_date' => $purchase_time,
-            'game_type_code' => $row['game_type_code'],
+            'game_type_code' => $gt_code,
             'game_type_id' => $gt_id,
             'winning_number' => $batch_double_res, // For footer display
             'batch_winning_amount' => $batch_win_total, // Use total from user_winnings
