@@ -163,7 +163,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         $tickets_to_add[] = [
             'number' => $display_number,
-            'qty' => $row['qty'],
+            'qty' => $row['qty'] * 10,
             'amount' => $row['amount'],
             'rate' => $row['rate'],
             'game_id' => $row['game_id'],
