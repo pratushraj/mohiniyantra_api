@@ -41,17 +41,34 @@ if (!$data || !isset($data['userId'])) {
     exit;
 }
 
+// Check if cancelled_at column exists, try to auto-add if missing
+$checkCol = mysqli_query($conn, "SHOW COLUMNS FROM tickets LIKE 'cancelled_at'");
+if (mysqli_num_rows($checkCol) == 0) {
+    // Attempt auto-add (might fail based on DB user permissions, but worth a try)
+    mysqli_query($conn, "ALTER TABLE tickets ADD COLUMN cancelled_at TIMESTAMP NULL DEFAULT NULL");
+    $checkCol = mysqli_query($conn, "SHOW COLUMNS FROM tickets LIKE 'cancelled_at'");
+}
+$hasCol = mysqli_num_rows($checkCol) > 0;
+
 $userId = mysqli_real_escape_string($conn, $data['userId']);
 $gameId = isset($data['gameId']) ? mysqli_real_escape_string($conn, $data['gameId']) : null;
 
 // 1. Check Maximum Cancellation Limit (3 batches today)
-$limitCheckQuery = "SELECT COUNT(DISTINCT purchase_date) as total_cancels 
-                    FROM tickets 
-                    WHERE user_id = '$userId' AND status = 0 AND DATE(cancelled_at) = CURDATE()";
+if ($hasCol) {
+    $limitCheckQuery = "SELECT COUNT(DISTINCT purchase_date) as total_cancels 
+                        FROM tickets 
+                        WHERE user_id = '$userId' AND status = 0 AND DATE(cancelled_at) = CURDATE()";
+} else {
+    // Fallback if column is still missing
+    $limitCheckQuery = "SELECT COUNT(DISTINCT purchase_date) as total_cancels 
+                        FROM tickets 
+                        WHERE user_id = '$userId' AND status = 0 AND ticket_date = '$today'";
+}
+
 $limitCheckSql = mysqli_query($conn, $limitCheckQuery);
 $limitRes = mysqli_fetch_assoc($limitCheckSql);
 
-if ($limitRes['total_cancels'] >= 3) {
+if ($limitRes && $limitRes['total_cancels'] >= 3) {
     http_response_code(400);
     echo json_encode(['status' => false, 'msg' => 'You have reached the maximum cancel limit']);
     exit;
@@ -92,8 +109,6 @@ mysqli_query($conn, "UPDATE purchase_summary
                      WHERE user_id = '$userId' AND date = '$today'");
 
 // 6. Update Ticket Status
-$checkCol = mysqli_query($conn, "SHOW COLUMNS FROM tickets LIKE 'cancelled_at'");
-$hasCol = mysqli_num_rows($checkCol) > 0;
 
 if ($hasCol) {
     $cancelQueryStr = "UPDATE tickets SET status = 0, cancelled_at = NOW() WHERE user_id = ? AND purchase_date = ?";
