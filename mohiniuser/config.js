@@ -260,6 +260,7 @@ async function updateLiveBalance() {
     }
 }
 
+let isFetchingResult = false;
 function updateCountdownUI() {
     if (!window.appGameDetails || !window.appGameDetails.endTime) return;
 
@@ -269,16 +270,45 @@ function updateCountdownUI() {
     target.setHours(hours, minutes, seconds, 0);
 
     let diff = target - now;
+
+    // If diff is negative but very small (e.g. less than 1 min), treat as 0
+    // If diff is very large negative, it might be the next day's first slot, handled by server returning correct end_time
     if (diff < 0) diff = 0;
+
+    // Trigger auto-publish logic when countdown hits 0
+    if (diff === 0 && !isFetchingResult) {
+        const currentEndTime = window.appGameDetails.endTime;
+        isFetchingResult = true;
+
+        // Poll for result every 1s for 5 seconds to ensure "automatic publish within 5s"
+        let fetchCount = 0;
+        const fetchInterval = setInterval(async () => {
+            await updateLiveHeader();
+            fetchCount++;
+            // If the end time has changed, it means we moved to the next slot
+            if (window.appGameDetails.endTime !== currentEndTime || fetchCount >= 6) {
+                clearInterval(fetchInterval);
+                isFetchingResult = false;
+            }
+        }, 1000);
+    }
 
     const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
     const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
     const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
 
+    // Urgent state: 5 seconds or less left
+    const isUrgent = diff <= 5100 && diff > 0;
+
     const countdownSpans = document.querySelectorAll('span');
     countdownSpans.forEach(span => {
-        if (span.textContent.includes('Countdown :')) {
+        if (span.textContent.includes('Countdown :') || span.id === 'countdown-timer') {
             span.textContent = `Countdown : ${h}:${m}:${s}`;
+            if (isUrgent) {
+                span.classList.add('countdown-urgent');
+            } else {
+                span.classList.remove('countdown-urgent');
+            }
         }
     });
 }
@@ -290,12 +320,14 @@ function startCountdown() {
 
 // Initialize live updates if logged in
 if (appGlobalConfig.userId) {
-    updateLiveHeader();
-    updateLiveBalance();
-    startCountdown();
+    document.addEventListener('DOMContentLoaded', () => {
+        updateLiveHeader();
+        updateLiveBalance();
+        startCountdown();
 
-    // Refresh header every 30s and balance every 3s
-    setInterval(updateLiveHeader, 30000);
-    setInterval(updateLiveBalance, 3000);
+        // Refresh header every 30s and balance every 3s
+        setInterval(updateLiveHeader, 30000);
+        setInterval(updateLiveBalance, 3000);
+    });
 }
 

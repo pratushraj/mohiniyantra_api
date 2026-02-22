@@ -124,6 +124,18 @@ body {
     color: #fff;
 }
 
+.countdown-urgent {
+    color: #ff0000 !important;
+    animation: blinker 0.5s linear infinite;
+    font-weight: bold;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
 .tab {
     padding: 12px 25px;
     border-radius: 4px;
