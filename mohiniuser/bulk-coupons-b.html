@@ -281,7 +281,11 @@
         }
 
         async function handleCancel() {
-            const result = await postData(CONFIG.CANCEL_TICKETS_URL, { userId: appGlobalConfig.userId }, "Ticket Cancelled Successfully");
+            const request = {
+                userId: appGlobalConfig.userId,
+                gameId: 2 // Side B
+            };
+            const result = await postData(CONFIG.CANCEL_TICKETS_URL, request, "Ticket Cancelled Successfully");
             if (result && typeof updateLiveBalance === 'function') updateLiveBalance();
         }
 

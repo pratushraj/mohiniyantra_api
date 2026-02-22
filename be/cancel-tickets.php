@@ -42,67 +42,73 @@ if (!$data || !isset($data['userId'])) {
 }
 
 $userId = mysqli_real_escape_string($conn, $data['userId']);
+$gameId = isset($data['gameId']) ? mysqli_real_escape_string($conn, $data['gameId']) : null;
 
-// Fetch all tickets
-$totalSingleATicketCount = 0;
-$totalSingleBTicketCount = 0;
-$totalDoubleTicketCount = 0;
+// 1. Check Maximum Cancellation Limit (3 batches today)
+$limitCheckQuery = "SELECT COUNT(DISTINCT purchase_date) as total_cancels 
+                    FROM tickets 
+                    WHERE user_id = '$userId' AND status = 0 AND DATE(cancelled_at) = CURDATE()";
+$limitCheckSql = mysqli_query($conn, $limitCheckQuery);
+$limitRes = mysqli_fetch_assoc($limitCheckSql);
 
-$totalSingleATicketCountPrice = 0;
-$totalSingleBTicketCountPrice = 0;
-$totalDoubleTicketCountPrice = 0;
-
-$fetchSql = mysqli_query($conn, "SELECT * FROM tickets WHERE user_id = $userId AND `status` = 1 AND ticket_date >= '$today' AND time_slot_id > '$lastTimeSlot'");
-while ($fetchRes = mysqli_fetch_assoc($fetchSql)) {
-    $gameId = $fetchRes['game_id'];
-    $ticketCount = $fetchRes['qty'];
-    $ticketPrice = $fetchRes['amount'];
-    if ($gameId == 1) {
-        $totalSingleATicketCount += $ticketCount;
-        $totalSingleATicketCountPrice += $ticketPrice;
-    } else if ($gameId == 2) {
-        $totalSingleBTicketCount += $ticketCount;
-        $totalSingleBTicketCountPrice += $ticketPrice;
-    } else if ($gameId == 3) {
-        $totalDoubleTicketCount += $ticketCount;
-        $totalDoubleTicketCountPrice += $ticketPrice;
-    }
+if ($limitRes['total_cancels'] >= 3) {
+    http_response_code(400);
+    echo json_encode(['status' => false, 'msg' => 'You have reached the maximum cancel limit']);
+    exit;
 }
 
-$totalTicketPrice = $totalSingleATicketCountPrice + $totalSingleBTicketCountPrice + $totalDoubleTicketCountPrice;
-// Wallet Balance Update
-$userWalletBalanceUpdSql = mysqli_query($conn, "UPDATE users SET wallet_balance = wallet_balance + $totalTicketPrice WHERE id = $userId");
+// 2. Find the latest purchase_date for active upcoming tickets
+$gameIdFilter = $gameId ? "AND game_id = '$gameId'" : "";
+$latestPurchaseQuery = "SELECT purchase_date 
+                        FROM tickets 
+                        WHERE user_id = '$userId' AND status = 1 AND ticket_date >= '$today' AND time_slot_id > '$lastTimeSlot' $gameIdFilter
+                        ORDER BY purchase_date DESC LIMIT 1";
+$latestSql = mysqli_query($conn, $latestPurchaseQuery);
 
+if (mysqli_num_rows($latestSql) == 0) {
+    http_response_code(404);
+    echo json_encode(['status' => false, 'msg' => 'No tickets found to cancel']);
+    exit;
+}
 
-// Purchase Summary Update
-$purchaseSummarySql = mysqli_query($conn, "
-            UPDATE `purchase_summary`
-            SET 
-                purchase_pts = purchase_pts - $totalTicketPrice,
-                net_pts = net_pts + $totalTicketPrice,
-                balance_pts = balance_pts + $totalTicketPrice
-            WHERE user_id = $userId AND date = '$today';
-        ");
+$latestRes = mysqli_fetch_assoc($latestSql);
+$latestDate = $latestRes['purchase_date'];
 
+// 3. Fetch tickets for this latest batch to calculate refund
+$totalRefund = 0;
+$fetchSql = mysqli_query($conn, "SELECT amount FROM tickets WHERE user_id = '$userId' AND purchase_date = '$latestDate' AND status = 1");
+while ($row = mysqli_fetch_assoc($fetchSql)) {
+    $totalRefund += $row['amount'];
+}
 
-// Update tickets table - try to set cancelled_at if column exists
+// 4. Update Wallet
+mysqli_query($conn, "UPDATE users SET wallet_balance = wallet_balance + $totalRefund WHERE id = '$userId'");
+
+// 5. Update Purchase Summary
+mysqli_query($conn, "UPDATE purchase_summary 
+                     SET purchase_pts = purchase_pts - $totalRefund, 
+                         net_pts = net_pts + $totalRefund, 
+                         balance_pts = balance_pts + $totalRefund 
+                     WHERE user_id = '$userId' AND date = '$today'");
+
+// 6. Update Ticket Status
 $checkCol = mysqli_query($conn, "SHOW COLUMNS FROM tickets LIKE 'cancelled_at'");
 $hasCol = mysqli_num_rows($checkCol) > 0;
 
 if ($hasCol) {
-    $query = "UPDATE tickets SET `status` = 0, `cancelled_at` = NOW() WHERE user_id = ? AND ticket_date >= ? AND time_slot_id > ?";
+    $cancelQueryStr = "UPDATE tickets SET status = 0, cancelled_at = NOW() WHERE user_id = ? AND purchase_date = ?";
 } else {
-    $query = "UPDATE tickets SET `status` = 0 WHERE user_id = ? AND ticket_date >= ? AND time_slot_id > ?";
+    $cancelQueryStr = "UPDATE tickets SET status = 0 WHERE user_id = ? AND purchase_date = ?";
 }
 
-$stmt = $conn->prepare($query);
-$stmt->bind_param("sss", $userId, $today, $lastTimeSlot);
+$stmt = $conn->prepare($cancelQueryStr);
+$stmt->bind_param("ss", $userId, $latestDate);
 
 if ($stmt->execute()) {
-    echo json_encode(['status' => true, 'msg' => 'Tickets cancelled Points ' . $totalTicketPrice . ' refunded to wallet']);
+    echo json_encode(['status' => true, 'msg' => 'Latest ticket batch cancelled. Points ' . $totalRefund . ' refunded.']);
 } else {
-    http_response_code(500); // Internal Server Error
-    echo json_encode(['status' => false, 'msg' => 'Failed to cancel upcoming tickets']);
+    http_response_code(500);
+    echo json_encode(['status' => false, 'msg' => 'Failed to cancel tickets']);
 }
 
 // Close the statement and database connection

@@ -173,16 +173,15 @@
                             // Total Points Row for this specific purchase/batch
                             const totalTr = document.createElement('tr');
                             totalTr.style.backgroundColor = "var(--header-bg)";
-                            totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold; border-top:2px solid #000;">Total Points (${batch.game_type_code}): ${batchTotalPoints.toFixed(3)}</td>`;
+                            totalTr.innerHTML = `<td colspan="4" style="text-align:center; font-weight:bold;">Total Points (${batch.game_type_code}): ${batchTotalPoints.toFixed(3)}</td>`;
                             tbody.appendChild(totalTr);
 
                             // Gift Points Row or Cancelled Row
                             if (batch.is_cancelled) {
                                 const cancelTr = document.createElement('tr');
                                 cancelTr.style.backgroundColor = "var(--header-bg)";
-                                // Format cancel_time if available, otherwise use date
                                 let cancelDisplay = formatCancelTime(batch.cancel_time || batch.gifteventcode);
-                                cancelTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Event Cancled on: ${cancelDisplay}</td>`;
+                                cancelTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Event Canceled On: ${cancelDisplay}</td>`;
                                 tbody.appendChild(cancelTr);
                             } else {
                                 const giftPtsTr = document.createElement('tr');
@@ -192,10 +191,10 @@
                                 tbody.appendChild(giftPtsTr);
                             }
 
-                            // Gift Code Row (Shows result if published)
+                            // Gift Code Row (Shows result if published) - Always Show
                             const giftCodeTr = document.createElement('tr');
                             giftCodeTr.style.backgroundColor = "var(--header-bg)";
-                            const winDisplay = (batch.winning_number !== null && batch.winning_number !== undefined && batch.winning_number !== "") ? (batch.game_type_code + batch.winning_number) : '--';
+                            const winDisplay = (batch.is_cancelled) ? '--' : ((batch.winning_number !== null && batch.winning_number !== undefined && batch.winning_number !== "") ? (batch.game_type_code + batch.winning_number) : '--');
                             giftCodeTr.innerHTML = `<td colspan="4" style="text-align:center; color:red; font-weight:bold;">Gift Code: ${winDisplay}</td>`;
                             tbody.appendChild(giftCodeTr);
                         }

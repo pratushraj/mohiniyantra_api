@@ -356,7 +356,8 @@
 
         async function handleCancel() {
             const request = {
-                userId: appGlobalConfig.userId
+                userId: appGlobalConfig.userId,
+                gameId: 1 // Side A
             };
             const result = await postData(CONFIG.CANCEL_TICKETS_URL, request, "Ticket Cancelled Successfully");
             if (result) {
