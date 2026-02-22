@@ -16,30 +16,36 @@
             flex-direction: column;
             min-height: 100vh;
             font-family: 'Outfit', sans-serif;
+            color: #000;
         }
 
-        .result-header {
+        .result-top-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 10px;
-            font-weight: bold;
+            padding: 2px 10px;
+            background-color: var(--card-bg);
+            height: 40px;
+        }
+
+        .ver-txt {
             font-size: 14px;
-            background-color: #eee8aa;
-            border-bottom: 2px solid #555;
+            color: #333;
         }
 
-        .close-btn {
-            background-color: #dc3545;
+        .btn-close-red {
+            background-color: #d32f2f;
             color: white;
-            border: 1px solid #000;
-            padding: 2px 20px;
-            font-size: 20px;
-            border-radius: 5px;
+            border: 2px solid #555;
+            padding: 2px 25px;
+            font-size: 26px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 400;
+            line-height: 1;
         }
 
-        /* Search Screen Styles (image.png style) */
+        /* Search Screen Styles */
         .search-screen {
             flex: 1;
             display: flex;
@@ -89,7 +95,83 @@
             text-align: center;
         }
 
-        /* Calendar Popover (Capture5.PNG style) */
+        /* Results Screen */
+        .results-view {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .res-date-bar {
+            background-color: var(--bg-pink);
+            text-align: center;
+            font-size: 32px;
+            padding: 10px 0;
+            color: #333;
+            font-weight: 400;
+        }
+
+        .res-container {
+            padding: 15px 10px 10px 10px;
+            /* Increased top padding */
+            flex: 1;
+            overflow-y: auto;
+            /* border: 3px solid #333; */
+            /* The main outer frame seen in screenshot */
+            margin: 0 10px 10px 10px;
+            border-radius: 2px;
+        }
+
+        .res-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0px 8px;
+            /* 0px horizontal, 8px vertical gap */
+            margin-top: 5px;
+            background-color: transparent;
+        }
+
+        .res-table thead th {
+            background-color: var(--card-bg);
+            border: 3px solid #333;
+            padding: 12px 10px;
+            text-align: center;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+
+        .res-table tbody td {
+            background-color: var(--card-bg);
+            border: 5px double #333;
+            /* Double border specifically for tbody */
+            padding: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .head-gift {
+            color: #ff3333;
+            font-size: 38px;
+            width: 32%;
+        }
+
+        .head-yantra {
+            color: #ff3333;
+            font-size: 38px;
+        }
+
+        .cell-time {
+            font-size: 36px;
+            color: #111;
+        }
+
+        .cell-val {
+            font-size: 36px;
+            color: #111;
+            width: 17%;
+        }
+
+        /* Calendar Popover */
         .calendar-overlay {
             position: fixed;
             top: 0;
@@ -108,41 +190,26 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 350px;
+            width: 320px;
             position: relative;
-            animation: fadeInScale 0.2s ease-out;
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
         }
 
         .calendar-close-x {
             position: absolute;
-            top: -15px;
-            right: -15px;
+            top: -10px;
+            right: -10px;
             background: white;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            font-weight: bold;
-            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
+        /* Calendar Styles Restored */
         .calendar-nav {
             display: flex;
             justify-content: space-between;
@@ -159,7 +226,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .current-month-year {
@@ -193,7 +259,6 @@
             cursor: pointer;
             font-size: 16px;
             background: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .calendar-day.other-month {
@@ -203,7 +268,6 @@
         .calendar-day.selected {
             background-color: #007bff !important;
             color: white !important;
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
         }
 
         .calendar-card-footer {
@@ -219,75 +283,24 @@
             border-radius: 20px;
             font-size: 20px;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Results Screen */
-        .results-view {
-            display: none;
-            flex: 1;
-            flex-direction: column;
         }
 
         .date-display-header {
             text-align: center;
             font-size: 24px;
-            margin: 10px 0;
+            margin-bottom: 10px;
             color: #007bff;
-        }
-
-        .result-table-container {
-            padding: 0 10px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .res-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .header-row th {
-            background-color: #eee8aa !important;
-            color: red;
-            font-size: 32px;
-            padding: 10px;
-            border: 2px solid #555;
-        }
-
-        .res-table th {
-            background-color: #fff5e6;
-            color: red;
-            font-size: 22px;
-            padding: 5px;
-            border: 2px solid #555;
-        }
-
-        .res-table td {
-            background-color: #fff5e6;
-            border: 2px solid #555;
-            padding: 4px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .msg-container {
-            text-align: center;
-            padding: 20px;
-            font-size: 20px;
-            display: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="result-header">
-        <span>0.0.12</span>
-        <button class="close-btn" id="headerCloseBtn">Close</button>
+    <div class="result-top-info">
+        <span class="ver-txt">0.0.12</span>
+        <button class="btn-close-red" id="headerCloseBtn">Close</button>
     </div>
 
-    <!-- 1. Search Screen (image.png style) -->
+    <!-- 1. Search Screen -->
     <div class="search-screen" id="searchScreen">
         <div class="date-search-box" id="openCalendarBtn">
             <div class="date-display-box" id="searchDateDisplay">--:--:----</div>
@@ -298,18 +311,20 @@
 
     <!-- 2. Results Screen -->
     <div class="results-view" id="resultsView">
-        <div class="date-display-header" id="resultsDateHeader">-- --- ----</div>
-        <div class="result-table-container">
+        <div class="res-date-bar" id="resultsDateHeader">22-02-2026</div>
+        <div class="res-container">
             <table class="res-table">
                 <thead>
-                    <tr class="header-row">
-                        <th style="width: 30%;">Gift Event Code</th>
-                        <th colspan="4">MOHINI GROUP</th>
+                    <tr>
+                        <th class="head-gift">Gift Event Code</th>
+                        <th class="head-yantra" colspan="4">YANTRA GROUP</th>
                     </tr>
                 </thead>
-                <tbody id="resultBody"></tbody>
+                <tbody id="resultBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
             </table>
-            <div id="loaderMsg" class="msg-container">Loading Results...</div>
+            <div id="loaderMsg" style="text-align: center; padding: 20px; font-size: 24px;">Loading Results...</div>
         </div>
     </div>
 
@@ -379,13 +394,15 @@
 
             // Final Search OK
             document.getElementById('searchOkBtn').addEventListener('click', () => {
-                const apiDate = formatDate(selectedDate);
-                const displayDateFull = `${selectedDate.getDate()} ${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+                const day = String(selectedDate.getDate()).padStart(2, '0');
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const year = selectedDate.getFullYear();
+                const displayDate = `${day}-${month}-${year}`;
 
-                document.getElementById('resultsDateHeader').textContent = displayDateFull;
+                document.getElementById('resultsDateHeader').textContent = displayDate;
                 document.getElementById('searchScreen').style.display = 'none';
                 document.getElementById('resultsView').style.display = 'flex';
-                fetchResults(apiDate);
+                fetchResults(formatDate(selectedDate));
             });
 
             // Global Close
@@ -400,14 +417,13 @@
         });
 
         function updateSearchDisplay() {
-            // Display date as 16-02-2026 for the main box (image.png style)
             const day = String(selectedDate.getDate()).padStart(2, '0');
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
             const year = selectedDate.getFullYear();
             document.getElementById('searchDateDisplay').textContent = `${day}-${month}-${year}`;
-
-            // Header for popup (Capture5.PNG style)
-            document.getElementById('popupHeaderDate').textContent = `${selectedDate.getDate()} ${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+            if (document.getElementById('popupHeaderDate')) {
+                document.getElementById('popupHeaderDate').textContent = `${selectedDate.getDate()} ${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+            }
         }
 
         function renderCalendar() {
@@ -472,10 +488,10 @@
                 if (json.status && json.data && json.data.length > 0) {
                     const sorted = json.data.sort((a, b) => Object.keys(b)[0].localeCompare(Object.keys(a)[0]));
                     sorted.forEach(item => {
-                        const time = Object.keys(item)[0];
-                        const codes = item[time];
+                        const time = Object.keys(item)[0].substring(0, 5);
+                        const codes = item[Object.keys(item)[0]];
                         const tr = document.createElement('tr');
-                        tr.innerHTML = `<td>${time}</td><td>${codes[0] || '--'}</td><td>${codes[1] || '--'}</td><td>${codes[2] || '--'}</td><td>${codes[3] || '--'}</td>`;
+                        tr.innerHTML = `<td class="cell-time">${time}</td><td class="cell-val">${codes[0] || '--'}</td><td class="cell-val">${codes[1] || '--'}</td><td class="cell-val">${codes[2] || '--'}</td><td class="cell-val">${codes[3] || '--'}</td>`;
                         body.appendChild(tr);
                     });
                 } else {
@@ -483,6 +499,7 @@
                     loader.style.display = 'block';
                 }
             } catch (e) {
+                console.error(e);
                 loader.textContent = "Error loading results.";
                 loader.style.display = 'block';
             }

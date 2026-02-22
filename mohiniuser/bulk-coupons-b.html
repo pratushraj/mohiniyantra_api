@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Dhankeshri Play - Bulk Coupons B</title>
     <link rel="stylesheet" href="style.css">
-    <script src="config.js"></script>
+    <script src="config.js?v=3"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             document.title = `${appGlobalConfig.appName} - Bulk Coupons B`;
@@ -118,7 +118,10 @@
         </div>
 
         <div class="bottom-actions">
-            <button class="action-btn btn-green">UPCOMMING [F1]</button>
+            <button class="action-btn btn-green" onclick="location.href='upcoming.html'">
+                UPCOMMING [F1]
+                <span id="upcomingBadge" class="upcoming-badge" style="display: none;">0</span>
+            </button>
             <button class="action-btn btn-green" id="buyBtn">SUBMIT [F2]</button>
             <button class="action-btn btn-red" onclick="clearAll()">CLEAR [F3]</button>
             <button class="action-btn btn-red" id="cancelBtn">CANCEL [F4]</button>
@@ -276,7 +279,8 @@
                 });
             });
             if (tickets.length === 0) { showPopup("Please enter the Bet", "Warning"); return; }
-            const result = await postData(CONFIG.TICKET_PURCHASE_URL, { userId: appGlobalConfig.userId, tickets }, "Ticket Purchased Successfully");
+            const totalAmt = document.getElementById('totalPts').textContent;
+            const result = await postData(CONFIG.TICKET_PURCHASE_URL, { userId: appGlobalConfig.userId, tickets }, `Buy Successful with Amt ${totalAmt}`);
             if (result) { clearAll(); if (typeof updateLiveBalance === 'function') updateLiveBalance(); }
         }
 
@@ -372,7 +376,8 @@
                     if (target) target.focus();
                 }
             }
-            if (e.key === 'F3') { e.preventDefault(); clearAll(); }
+            if (e.key === 'F1') { e.preventDefault(); location.href = 'upcoming.html'; }
+            else if (e.key === 'F3') { e.preventDefault(); clearAll(); }
             else if (e.key === 'F2') { e.preventDefault(); handleBuy(); }
             else if (e.key === 'F4') { e.preventDefault(); handleCancel(); }
             else if (e.key === 'F5') { e.preventDefault(); location.href = 'result.html'; }

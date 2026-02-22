@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Events</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js?v=3"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .up-header {
+            background-color: #0080ff;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .version-tag {
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            font-size: 14px;
+            color: #111;
+        }
+
+        .up-header h1 {
+            color: white;
+            margin: 0;
+            font-size: 42px;
+            letter-spacing: 2px;
+            font-weight: normal;
+        }
+
+        .btn-close-rect {
+            position: absolute;
+            right: 20px;
+            top: 5px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            padding: 8px 30px;
+            font-size: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-bar {
+            background-color: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0px;
+            height: 35px;
+        }
+
+        .draw-selected {
+            background-color: #ffff00;
+            color: #000;
+            padding: 5px 15px;
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 150px;
+        }
+
+        .search-area {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .up-search {
+            background: white;
+            border: 1px solid #999;
+            padding: 2px 5px;
+            font-style: italic;
+            width: 100px;
+            font-size: 14px;
+        }
+
+        .btn-all {
+            background-color: #ff0000;
+            color: white;
+            border: 1px solid white;
+            padding: 2px 15px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            overflow-y: auto;
+            position: relative;
+            border-right: 15px solid #ffcc00;
+            /* The yellow bar from image */
+        }
+
+        .event-card {
+            display: flex;
+            height: 60px;
+            width: 140px;
+            background-color: white;
+            overflow: hidden;
+            border-radius: 2px;
+            border: 1px solid #666;
+        }
+
+        .card-left {
+            width: 50px;
+            background-color: white;
+        }
+
+        .card-right {
+            flex: 1;
+            background-color: #558b2f;
+            /* Dark Green */
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: normal;
+        }
+
+        .no-data {
+            font-size: 24px;
+            text-align: center;
+            width: 100%;
+            margin-top: 50px;
+            color: #aaa;
+        }
+
+        /* Custom Checkbox UI */
+        .card-left {
+            width: 45px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .tick-mark {
+            display: none;
+        }
+
+        .event-card.selected .tick-mark {
+            display: block;
+        }
+
+        .event-card {
+            border: 2px solid white !important;
+            box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+            width: 160px !important;
+            height: 65px !important;
+        }
+
+        .card-right {
+            font-family: 'Arial Narrow', sans-serif;
+            font-weight: normal !important;
+            font-size: 44px !important;
+            color: #111 !important;
+        }
+
+        /* Top All Checkbox */
+        .all-container {
+            display: flex;
+            align-items: center;
+            height: 30px;
+            overflow: hidden;
+            border: 1px solid #fff;
+        }
+
+        .all-tick-box {
+            width: 30px;
+            height: 30px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .all-label-box {
+            background: #ff0000;
+            color: white;
+            padding: 0 10px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #checkAllSlots {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="up-header">
+        <span class="version-tag">0.0.12</span>
+        <h1>Upcomming Event</h1>
+        <button class="btn-close-rect" onclick="location.href='bulk-coupons.html'">Close</button>
+    </div>
+
+    <div class="info-bar">
+        <div class="draw-selected" id="selectedDrawCount" style="padding: 10px 15px; font-size: 20px;">Selected draw: 0
+        </div>
+        <div class="search-area">
+            <input type="text" class="up-search" placeholder="Enter text..."
+                style="height: 28px; width: 120px; font-style: italic;">
+
+            <div class="all-container" onclick="toggleAll()">
+                <div class="all-tick-box">
+                    <span id="allTick" style="display: none;">✓</span>
+                </div>
+                <div class="all-label-box">All</div>
+            </div>
+
+            <button class="btn-all" id="btnSubmitSelection"
+                style="background-color: #558b2f; margin-left:10px; display: none;">Submit</button>
+        </div>
+    </div>
+
+    <div class="main-content" id="eventsGrid">
+        <!-- Render cards here -->
+    </div>
+
+    <script>
+        let selectedSlots = new Set();
+
+        async function loadUpcoming() {
+            const grid = document.getElementById('eventsGrid');
+            try {
+                const response = await fetch(CONFIG.UPCOMING_EVENTS_URL);
+                const json = await response.json();
+
+                if (json.status && json.data.length > 0) {
+                    grid.innerHTML = '';
+                    json.data.forEach(item => {
+                        const timeStr = item.time.substring(0, 5); // HH:mm
+                        const slotId = item.time_slot_id;
+
+                        const card = document.createElement('div');
+                        card.className = 'event-card';
+                        card.setAttribute('data-slot-id', slotId);
+                        card.style.cursor = 'pointer';
+                        card.innerHTML = `
+                            <div class="card-left">
+                                <span class="tick-mark">✓</span>
+                            </div>
+                            <div class="card-right">${timeStr}</div>
+                        `;
+
+                        card.addEventListener('click', () => {
+                            const isSelected = card.classList.toggle('selected');
+                            if (isSelected) selectedSlots.add(slotId);
+                            else selectedSlots.delete(slotId);
+
+                            updateSelectedCount();
+                            syncAllTick();
+                            submitSelection(true);
+                        });
+
+                        grid.appendChild(card);
+                    });
+
+                    // Restore saved selections
+                    await restoreSelections();
+                } else {
+                    grid.innerHTML = '<div class="no-data">No upcoming events for today.</div>';
+                }
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = '<div class="no-data">Error loading data.</div>';
+            }
+        }
+
+        async function restoreSelections() {
+            try {
+                const date = window.appGameDetails ? window.appGameDetails.date : formatDate(new Date());
+                const res = await fetch(`${CONFIG.BASE_URL}/get_selected_draws.php?userId=${appGlobalConfig.userId}&date=${date}`);
+                const json = await res.json();
+
+                if (json.status && json.data) {
+                    const savedIds = json.data.map(id => id.toString());
+                    document.querySelectorAll('.event-card').forEach(card => {
+                        const sid = card.getAttribute('data-slot-id');
+                        if (savedIds.includes(sid.toString())) {
+                            card.classList.add('selected');
+                            selectedSlots.add(sid);
+                        }
+                    });
+
+                    updateSelectedCount();
+                    syncAllTick();
+                }
+            } catch (e) {
+                console.error("Failed to restore selections", e);
+            }
+        }
+
+        function toggleAll() {
+            const cards = document.querySelectorAll('.event-card');
+            const allSelected = Array.from(cards).every(c => c.classList.contains('selected'));
+
+            cards.forEach(card => {
+                const sid = card.getAttribute('data-slot-id');
+                if (allSelected) {
+                    card.classList.remove('selected');
+                    selectedSlots.delete(sid);
+                } else {
+                    card.classList.add('selected');
+                    selectedSlots.add(sid);
+                }
+            });
+
+            updateSelectedCount();
+            syncAllTick();
+            submitSelection(true);
+        }
+
+        function syncAllTick() {
+            const cards = document.querySelectorAll('.event-card');
+            const allSelected = cards.length > 0 && Array.from(cards).every(c => c.classList.contains('selected'));
+            const allTick = document.getElementById('allTick');
+            if (allTick) allTick.style.display = allSelected ? 'block' : 'none';
+        }
+
+        function updateSelectedCount() {
+            document.getElementById('selectedDrawCount').textContent = `Selected draw: ${selectedSlots.size}`;
+        }
+
+        async function submitSelection(isAuto = false) {
+            const slotIds = Array.from(selectedSlots);
+            const request = {
+                userId: appGlobalConfig.userId,
+                slotIds: slotIds,
+                date: window.appGameDetails ? window.appGameDetails.date : formatDate(new Date())
+            };
+
+            if (isAuto) {
+                try {
+                    await fetch(`${CONFIG.BASE_URL}/save_selected_draws.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(request)
+                    });
+                    localStorage.setItem('selectedTimeSlots', JSON.stringify(slotIds));
+                } catch (e) { console.error("Auto-submit failed", e); }
+            } else {
+                if (selectedSlots.size === 0) {
+                    showPopup("Please select at least one draw.", "Warning");
+                    return;
+                }
+                const result = await postData(`${CONFIG.BASE_URL}/save_selected_draws.php`, request, "Selection Saved Successfully");
+                if (result) {
+                    localStorage.setItem('selectedTimeSlots', JSON.stringify(slotIds));
+                }
+            }
+        }
+
+        document.getElementById('btnSubmitSelection').addEventListener('click', submitSelection);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key.toLowerCase() === 'q') {
+                location.href = 'index.html';
+            }
+            if (e.key === 'F2') {
+                submitSelection();
+            }
+        });
+
+        window.addEventListener('load', loadUpcoming);
+    </script>
+</body>
+
+</html>

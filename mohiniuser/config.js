@@ -211,9 +211,48 @@ async function updateLiveHeader() {
 
             if (typeof updateDynamicUI === 'function') updateDynamicUI();
             if (typeof updateCountdownUI === 'function') updateCountdownUI();
+
+            updateUpcomingBadge();
         }
     } catch (e) {
         console.error("Failed to fetch game details", e);
+    }
+}
+
+async function updateUpcomingBadge() {
+    if (!appGlobalConfig.userId) return;
+    try {
+        const date = window.appGameDetails.date !== '---' ? window.appGameDetails.date : new Date().toISOString().split('T')[0];
+
+        // Parallel fetch for speed
+        const [selRes, upRes] = await Promise.all([
+            fetch(`${CONFIG.BASE_URL}/get_selected_draws.php?userId=${appGlobalConfig.userId}&date=${date}`),
+            fetch(CONFIG.UPCOMING_EVENTS_URL)
+        ]);
+
+        const selJson = await selRes.json();
+        const upJson = await upRes.json();
+
+        if (selJson.status && upJson.status) {
+            const selectedIds = selJson.data.map(id => id.toString());
+            const upcomingIds = upJson.data.map(item => item.time_slot_id.toString());
+
+            // Count how many of the user's selected draws are still in the upcoming list
+            const activeCount = selectedIds.filter(id => upcomingIds.includes(id)).length;
+
+            const badge = document.getElementById('upcomingBadge');
+            if (badge) {
+                badge.textContent = activeCount;
+                badge.style.display = activeCount > 0 ? 'flex' : 'none';
+            }
+        } else {
+            const badge = document.getElementById('upcomingBadge');
+            if (badge) badge.style.display = 'none';
+        }
+    } catch (e) {
+        console.error("Badge update failed", e);
+        const badge = document.getElementById('upcomingBadge');
+        if (badge) badge.style.display = 'none';
     }
 }
 
@@ -225,8 +264,15 @@ async function postData(url, data, success_msg) {
             body: JSON.stringify(data)
         });
         const response = await res.json();
-        if (res.ok && response.status === true) {
-            showPopup(response.msg || success_msg, "Success");
+        if (res.ok && response.status == true) {
+            // Force use our message if provided
+            let finalMsg = "Buy Successful";
+            if (success_msg) {
+                finalMsg = success_msg;
+            } else if (response.msg) {
+                finalMsg = response.msg;
+            }
+            showPopup(finalMsg, "Success");
             return response;
         } else {
             showPopup(response.msg || "Transaction failed", "Error");
@@ -262,12 +308,16 @@ async function updateLiveBalance() {
 
 let isFetchingResult = false;
 function updateCountdownUI() {
-    if (!window.appGameDetails || !window.appGameDetails.endTime) return;
+    if (!window.appGameDetails || !window.appGameDetails.endTime || window.appGameDetails.date === '---') return;
 
     const now = new Date();
-    const [hours, minutes, seconds] = window.appGameDetails.endTime.split(':');
-    const target = new Date();
-    target.setHours(hours, minutes, seconds, 0);
+
+    // Parse the date and time from the server response
+    const [y, month, d] = window.appGameDetails.date.split('-').map(Number);
+    const [hours, minutes, seconds] = window.appGameDetails.endTime.split(':').map(Number);
+
+    // Create target date in local time
+    const target = new Date(y, month - 1, d, hours, minutes, seconds, 0);
 
     let diff = target - now;
 
@@ -300,16 +350,19 @@ function updateCountdownUI() {
     // Urgent state: 5 seconds or less left
     const isUrgent = diff <= 5100 && diff > 0;
 
-    const countdownSpans = document.querySelectorAll('span');
-    countdownSpans.forEach(span => {
-        if (span.textContent.includes('Countdown :') || span.id === 'countdown-timer') {
-            span.textContent = `Countdown : ${h}:${m}:${s}`;
-            if (isUrgent) {
-                span.classList.add('countdown-urgent');
-            } else {
-                span.classList.remove('countdown-urgent');
-            }
-        }
+    const countdownElements = document.querySelectorAll('#countdown-timer, .countdown-timer');
+    const allSpans = document.querySelectorAll('span');
+
+    // Helper to update element
+    const updateEl = (el) => {
+        el.textContent = `Countdown : ${h}:${m}:${s}`;
+        if (isUrgent) el.classList.add('countdown-urgent');
+        else el.classList.remove('countdown-urgent');
+    };
+
+    countdownElements.forEach(updateEl);
+    allSpans.forEach(span => {
+        if (span.textContent.includes('Countdown :')) updateEl(span);
     });
 }
 

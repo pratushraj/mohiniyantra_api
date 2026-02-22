@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Dhankeshri Play - Loose Coupons</title>
     <link rel="stylesheet" href="style.css">
-    <script src="config.js"></script>
+    <script src="config.js?v=3"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             document.title = `${appGlobalConfig.appName} - Loose Coupons`;
@@ -81,7 +81,10 @@
         </div>
 
         <div class="bottom-actions" style="margin-top: 10px;">
-            <button class="action-btn btn-green">UPCOMMING [F1]</button>
+            <button class="action-btn btn-green" onclick="location.href='upcoming.html'">
+                UPCOMMING [F1]
+                <span id="upcomingBadge" class="upcoming-badge" style="display: none;">0</span>
+            </button>
             <button class="action-btn btn-green" onclick="handleBuy()">SUBMIT [F2]</button>
             <button class="action-btn btn-red" onclick="clearAll(); for(let key in tabState) tabState[key]={};">CLEAR
                 [F3]</button>
@@ -123,9 +126,24 @@
         const tabState = {};
 
         function initTabSystem() {
-            if (appConfig.groups.length > 0) {
-                if (!currentTab) currentTab = appConfig.groups[0].id;
-                appConfig.groups.forEach(g => {
+            if (SHARED_GROUPS.length > 0) {
+                // First, sync the HTML elements with the correct numeric IDs from SHARED_GROUPS
+                const tabEls = document.querySelectorAll('.sub-tab');
+                SHARED_GROUPS.forEach((group, index) => {
+                    if (tabEls[index]) {
+                        tabEls[index].setAttribute('data-id', group.id);
+                        tabEls[index].textContent = group.code;
+                    }
+                });
+
+                const activeTabEl = document.querySelector('.sub-tab.active');
+                if (activeTabEl) {
+                    currentTab = activeTabEl.getAttribute('data-id');
+                } else {
+                    currentTab = SHARED_GROUPS[0].id;
+                }
+
+                SHARED_GROUPS.forEach(g => {
                     if (!tabState[g.id]) tabState[g.id] = {};
                 });
             }
@@ -151,8 +169,20 @@
         updateDynamicUI = function () {
             if (originalUpdateDynamicUI) originalUpdateDynamicUI();
             initTabSystem();
+            // Automatically click the first tab on load to ensure sync
+            const firstTab = document.querySelector('.sub-tab');
+            if (firstTab && !currentTab) switchSubTab(firstTab);
         }
+
+        // Initial execution on page load
         initTabSystem();
+        window.addEventListener('load', () => {
+            // Find the sub-tab for the first game group (usually data-id="1")
+            const firstTab = document.querySelector('.sub-tab[data-id="1"]') || document.querySelector('.sub-tab');
+            if (firstTab) {
+                switchSubTab(firstTab);
+            }
+        });
 
         function switchSubTab(element) {
             saveTabState();
@@ -169,6 +199,7 @@
         }
 
         async function handleBuy() {
+            if (!currentTab) initTabSystem();
             saveTabState();
             if (!window.appGameDetails || !window.appGameDetails.timeSlotId) {
                 showPopup("Game details not loaded yet.", "Error");
@@ -191,7 +222,8 @@
                 }
             });
             if (tickets.length === 0) { showPopup("Please enter the Bet", "Warning"); return; }
-            const result = await postData(CONFIG.TICKET_PURCHASE_URL, { userId: appGlobalConfig.userId, tickets }, "Ticket Purchased Successfully");
+            const totalAmt = document.getElementById('ptsDisplay').textContent.replace('Pts ', '');
+            const result = await postData(CONFIG.TICKET_PURCHASE_URL, { userId: appGlobalConfig.userId, tickets }, `Buy Successful with Amt ${totalAmt}`);
             if (result) {
                 for (let key in tabState) tabState[key] = {};
                 clearAll();
@@ -207,6 +239,7 @@
                 userId: appGlobalConfig.userId,
                 gameId: 3 // Double Game
             };
+            const totalAmt = document.getElementById('ptsDisplay').textContent.replace('Pts ', '');
             const result = await postData(CONFIG.CANCEL_TICKETS_URL, request, "Ticket Cancelled Successfully");
             if (result && typeof updateLiveBalance === 'function') updateLiveBalance();
         }
@@ -423,7 +456,8 @@
                     if (target) target.focus();
                 }
             }
-            if (e.key === 'F3') { e.preventDefault(); clearAll(); for (let k in tabState) tabState[k] = {}; }
+            if (e.key === 'F1') { e.preventDefault(); location.href = 'upcoming.html'; }
+            else if (e.key === 'F3') { e.preventDefault(); clearAll(); for (let k in tabState) tabState[k] = {}; }
             else if (e.key === 'F2') { e.preventDefault(); handleBuy(); }
             else if (e.key === 'F4') { e.preventDefault(); handleCancel(); }
             else if (e.key === 'F5') { e.preventDefault(); location.href = 'result.html'; }
