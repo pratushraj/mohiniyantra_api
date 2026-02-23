@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RajaRani Mohini Coupons | Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --bg-yellow: #ffff00;
+            --text-red: #ff0000;
+            --border-blue: #00ccff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-yellow);
+            font-family: 'Questrial', Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 20px;
+        }
+
+        .btn-results {
+            background: linear-gradient(to bottom, #eb2727 0%, #eb2727 44%, #a40000 50%, #7a0000 100%);
+            color: #fff;
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 5px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-yellow);
+            border-top: 2px solid #5c4c34;
+            border-bottom: 2px solid #5c4c34;
+            padding: 8px 20px;
+            margin: 0 10px;
+            font-weight: bold;
+            font-size: 20px;
+            color: var(--text-red);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            padding: 25px;
+            max-width: 960px;
+            margin: 0 auto;
+            justify-items: center;
+        }
+
+        .product-card {
+            text-align: center;
+        }
+
+        .product-title {
+            color: var(--text-red);
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .card-frame {
+            width: 320px;
+            height: 320px;
+            border: 5px solid #111;
+            padding: 8px 14px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px var(--border-blue);
+            background: url('assets/background/back.png') center center / cover no-repeat;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .card-img {
+            width: 278px;
+            flex: 1;
+            object-fit: cover;
+            border: 2px solid gold;
+            border-radius: 4px;
+            display: block;
+            height: 200px;
+        }
+
+        .card-label {
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px 8px 2px 8px;
+            text-shadow: 1px 1px 2px #000;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-code {
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 2px 8px 6px 8px;
+            text-shadow: 1px 1px 2px #000;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Shuffling glow effect */
+        .shuffling .card-frame {
+            animation: glowPulse 0.3s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            from {
+                box-shadow: 0 0 20px #ff0000;
+            }
+
+            to {
+                box-shadow: 0 0 60px #ff3300, 0 0 100px #ff6600;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .card-frame {
+                width: 100%;
+                height: auto;
+                min-height: 280px;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .info-bar {
+                font-size: 14px;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .product-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            // 1. Disable right-click
+            document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+            // 2. Block all DevTools keyboard shortcuts
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'F12') { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k'].includes(e.key)) { e.preventDefault(); return false; }
+                if (e.ctrlKey && ['U', 'u', 'S', 's', 'P', 'p'].includes(e.key)) { e.preventDefault(); return false; }
+            }, true);
+
+            // 3. Disable all console methods
+            try {
+                var noop = function () { };
+                ['log', 'warn', 'info', 'error', 'dir', 'table', 'trace', 'group', 'groupEnd', 'time', 'timeEnd', 'assert', 'clear', 'count', 'debug', 'dirxml', 'exception', 'profile', 'profileEnd'].forEach(function (m) {
+                    try { window.console[m] = noop; } catch (e) { }
+                });
+            } catch (e) { }
+
+            // 4. DevTools detection via debugger timing — if devtools open, page goes blank
+            var _blocked = false;
+            setInterval(function () {
+                if (_blocked) return;
+                var t1 = +new Date();
+                (function () { })['constructor']('debugger')();
+                var t2 = +new Date();
+                if (t2 - t1 > 120) {
+                    _blocked = true;
+                    document.documentElement.innerHTML = '';
+                    window.location.replace('about:blank');
+                }
+            }, 800);
+
+            // 5. Override toString method to detect element inspection trick
+            var _el = document.createElement('div');
+            Object.defineProperty(_el, 'id', {
+                get: function () { _blocked = true; document.documentElement.innerHTML = ''; window.location.replace('about:blank'); }
+            });
+        })();
+    </script>
+</head>
+
+<body>
+
+    <div class="header-actions">
+        <a href="result.html" class="btn-results">RESULTS</a>
+    </div>
+
+    <div class="info-bar">
+        <div id="currentDate">Date : -- -- ----</div>
+        <div id="nextTime">Time : --:-- --</div>
+    </div>
+
+    <div class="grid-container" id="cardGrid">
+
+        <div class="product-card" id="card-0">
+            <div class="product-title" id="title-0">Product Code :</div>
+            <div class="card-frame">
+                <img class="card-img" id="img-0" src="assets/Kamala Yantra.PNG" alt="Yantra">
+                <div class="card-label" id="name-0">NAVRATNA GOLDEN</div>
+                <div class="card-code" id="code-0">Product Code :- --</div>
+            </div>
+        </div>
+
+        <div class="product-card" id="card-1">
+            <div class="product-title" id="title-1">Product Code :</div>
+            <div class="card-frame">
+                <img class="card-img" id="img-1" src="assets/Bhairav Yantra.PNG" alt="Yantra">
+                <div class="card-label" id="name-1">BHAIRAV YANTRA</div>
+                <div class="card-code" id="code-1">Product Code :- --</div>
+            </div>
+        </div>
+
+        <div class="product-card" id="card-2">
+            <div class="product-title" id="title-2">Product Code :</div>
+            <div class="card-frame">
+                <img class="card-img" id="img-2" src="assets/Matsya Yantra.PNG" alt="Yantra">
+                <div class="card-label" id="name-2">MATSYA YANTRA</div>
+                <div class="card-code" id="code-2">Product Code :- --</div>
+            </div>
+        </div>
+
+        <div class="product-card" id="card-3">
+            <div class="product-title" id="title-3">Product Code :</div>
+            <div class="card-frame">
+                <img class="card-img" id="img-3" src="assets/Ganesha Yantra.PNG" alt="Yantra">
+                <div class="card-label" id="name-3">GANESHA YANTRA</div>
+                <div class="card-code" id="code-3">Product Code :- --</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const allImages = [
+            'assets/Bhairav Yantra.PNG',
+            'assets/Ganesha Yantra.PNG',
+            'assets/Kamala Yantra.PNG',
+            'assets/Kamala Yantra2.PNG',
+            'assets/Matsya Yantra.PNG',
+            'assets/Yantra Kamala.PNG',
+            'assets/1323BSriYantra.jpg',
+            'assets/ohm.png',
+            'assets/Screenshot 2026-02-24 at 01-52-16 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
+            'assets/Screenshot 2026-02-24 at 01-52-39 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
+            'assets/Screenshot 2026-02-24 at 01-52-45 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
+            'assets/Screenshot 2026-02-24 at 01-53-01 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
+            'assets/Screenshot 2026-02-24 at 01-53-17 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
+            'assets/Screenshot 2026-02-24 at 01-53-52 Shree yantra stock photos royalty-free images vectors video.png'
+        ];
+
+        // Per-card state — initialized flag prevents treating old results as "new"
+        const cardState = [
+            { interval: null, lastResult: null, initialized: false },
+            { interval: null, lastResult: null, initialized: false },
+            { interval: null, lastResult: null, initialized: false },
+            { interval: null, lastResult: null, initialized: false }
+        ];
+
+        function getRandomImage() {
+            return allImages[Math.floor(Math.random() * allImages.length)];
+        }
+
+        function startShuffle(i) {
+            if (cardState[i].interval) return;
+            const card = document.getElementById(`card-${i}`);
+            const img = document.getElementById(`img-${i}`);
+            card.classList.add('shuffling');
+            cardState[i].interval = setInterval(() => {
+                img.src = getRandomImage();
+            }, 100);
+        }
+
+        function stopShuffle(i, winCode) {
+            const state = cardState[i];
+            if (state.interval) {
+                clearInterval(state.interval);
+                state.interval = null;
+            }
+            const card = document.getElementById(`card-${i}`);
+            const img = document.getElementById(`img-${i}`);
+            const code = document.getElementById(`code-${i}`);
+            const title = document.getElementById(`title-${i}`);
+            card.classList.remove('shuffling');
+            img.src = getRandomImage();
+            if (winCode) {
+                title.innerText = `Product Code : ${winCode}`;
+                code.innerText = `Product Code :- ${winCode}`;
+            } else {
+                title.innerText = 'Product Code :';
+                code.innerText = 'Product Code :- --';
+            }
+        }
+
+        async function fetchDetails() {
+            try {
+                const res = await fetch(CONFIG.GAME_DETAILS_URL);
+                const json = await res.json();
+
+                if (!json.status || !json.data) return;
+                const data = json.data;
+
+                // Date/time bar
+                const d = new Date();
+                document.getElementById('currentDate').innerText = `Date : ${formatDate(d)}`;
+                if (data.end_time) {
+                    let [h, m] = data.end_time.substring(0, 5).split(':');
+                    const ampm = +h >= 12 ? 'PM' : 'AM';
+                    h = +h % 12 || 12;
+                    document.getElementById('nextTime').innerText =
+                        `Time :${String(h).padStart(2, '0')}:${m} ${ampm}`;
+                }
+
+                const results = data.prev_game_results || [];
+                const todayDate = data.date || ''; // "YYYY-MM-DD" from API
+
+                for (let i = 0; i < 4; i++) {
+                    const state = cardState[i];
+                    const r = results[i];
+
+                    // Only treat as valid result if result_date == today's date
+                    const isToday = r && r.result_date && todayDate && (r.result_date === todayDate);
+                    const winCode = (isToday && r.win_code && r.win_code !== '--') ? r.win_code : null;
+
+                    if (r && r.game_type_name) {
+                        document.getElementById(`name-${i}`).innerText = r.game_type_name;
+                    }
+
+                    if (!state.initialized) {
+                        // ── FIRST LOAD ──
+                        state.initialized = true;
+                        if (winCode) {
+                            // Old result already exists → show immediately, no shuffle
+                            state.lastResult = winCode;
+                            stopShuffle(i, winCode); // just stops & sets text (no glow)
+                        } else {
+                            // No result yet → start shuffling and wait
+                            state.lastResult = null;
+                            startShuffle(i);
+                        }
+                    } else {
+                        // ── SUBSEQUENT POLLS ──
+                        if (!winCode) {
+                            // Still no result → keep shuffling
+                            state.lastResult = null;
+                            startShuffle(i);
+                        } else if (state.lastResult !== winCode) {
+                            // NEW result published while page is open → 10s dramatic shuffle then stop
+                            state.lastResult = winCode;
+                            if (!state.interval) startShuffle(i);
+                            const ci = i, cw = winCode;
+                            setTimeout(() => stopShuffle(ci, cw), 10000);
+                        }
+                        // else: same result as before → nothing to do
+                    }
+                }
+            } catch (e) {
+                console.error('fetchDetails error:', e);
+            }
+        }
+
+        // All 4 cards start shuffling immediately on page open
+        for (let i = 0; i < 4; i++) startShuffle(i);
+
+        fetchDetails();
+        setInterval(fetchDetails, 30000);
+    </script>
+</body>
+
+</html>
