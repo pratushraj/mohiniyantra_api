@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
 :root {
-    --bg-pink: #e96681;
+    --bg-pink: #f27289;
     --card-bg: #fff8c0;
     --header-bg: #fff8c0;
     --text-color: #000166;
@@ -31,13 +31,16 @@ body {
 
 /* Header & Navigation */
 .top-bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 5px 55px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
     font-size: 14px;
-    font-weight: 500;
-    position: relative;
-    min-height: 85px;
+    font-weight: 600;
+}
+
+.result-cell {
+    font-weight: normal !important;
+    font-size: 21px !important;
 }
 
 .version-info {
@@ -189,7 +192,7 @@ body {
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 16px;
+    font-size: 19px;
 }
 
 .data-table th,
@@ -315,7 +318,7 @@ body {
 }
 
 .btn-red {
-    background-color: #c02026;
+    background: linear-gradient(to bottom, #e74c3c, #c0392b);
 }
 
 .btn-dark-red {
@@ -404,25 +407,28 @@ body {
     align-items: center;
     justify-content: center;
     flex: 1;
+    position: relative;
 }
 
 .nav-main-btn {
     background: linear-gradient(to bottom, #28a745, #1e7e34);
     color: white;
-    font-size: 24px;
-    padding: 20px 60px;
+    font-size: 41px;
+    padding: 14px 54px;
     border-radius: 10px;
     border: none;
     cursor: pointer;
     box-shadow: 0 6px 0 #155d27;
-    margin-bottom: 50px;
+    margin-bottom: 20rem;
 }
 
 .bottom-nav {
     display: flex;
-    gap: 30px;
+    justify-content: space-between;
+    width: 100%;
     position: absolute;
     bottom: 50px;
+    padding: 0 50px;
 }
 
 /* Change Password Screen */

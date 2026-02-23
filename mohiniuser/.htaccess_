@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# User-Agent check karein
+RewriteCond %{HTTP_USER_AGENT} !^RR-Secure-Software-App-v1.0$ [NC]
+
+# Secret Header check karein (Maine software mein set kiya hai)
+RewriteCond %{HTTP:X-Software-Auth} !^RR-SECURE-KEY-99$
+
+# Agar upar waale dono match nahi karte, toh access block kar do (Forbidden)
+RewriteRule ^.*$ - [F,L]

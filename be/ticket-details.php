@@ -83,14 +83,8 @@ while ($row = mysqli_fetch_assoc($result)) {
             }
         }
 
-        // Mapping based on user input: 1:KY, 2:BY, 3:RM, 4:DY
-        $code_mapping = [
-            1 => 'KY',
-            2 => 'BY',
-            3 => 'RM',
-            4 => 'DY'
-        ];
-        $gt_code = isset($code_mapping[$gt_id]) ? $code_mapping[$gt_id] : (isset($row['game_type_code']) ? $row['game_type_code'] : '??');
+        // Use game_type_code directly from DB (fetched via LEFT JOIN game_types)
+        $gt_code = isset($row['game_type_code']) ? $row['game_type_code'] : '??';
 
         $grouped_data[$batch_key] = [
             'gifteventcode' => $event_code,
