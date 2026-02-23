@@ -82,21 +82,57 @@ function showPopup(message, title = 'Notification') {
         overlay.id = 'customOverlay';
         overlay.className = 'custom-modal-overlay';
         overlay.innerHTML = `
-            <div class="custom-modal">
-                <div class="custom-modal-header">
+            <div class="custom-modal" id="customModalBox">
+                <div class="custom-modal-header" id="customModalHeader">
+                    <span class="modal-icon" id="modalIcon"></span>
                     <span id="modalTitle">Notification</span>
                 </div>
                 <div class="custom-modal-body" id="modalMessage">
                     Message goes here...
                 </div>
                 <div class="custom-modal-footer">
-                    <button class="modal-close-btn" onclick="closePopup()">OK</button>
+                    <button class="modal-close-btn" id="modalCloseBtn" onclick="closePopup()">OK</button>
                 </div>
             </div>
         `;
         document.body.appendChild(overlay);
     }
 
+    // Color-code by title
+    const titleLower = title.toLowerCase();
+    let headerBg, btnBg, btnShadow, icon;
+
+    if (titleLower.includes('success')) {
+        headerBg = 'linear-gradient(135deg, #1a9e4a, #16834a)';
+        btnBg = 'linear-gradient(135deg, #1a9e4a, #16834a)';
+        btnShadow = 'rgba(22, 131, 74, 0.45)';
+        icon = '✅';
+    } else if (titleLower.includes('error') || titleLower.includes('connection')) {
+        headerBg = 'linear-gradient(135deg, #c0392b, #962d22)';
+        btnBg = 'linear-gradient(135deg, #c0392b, #962d22)';
+        btnShadow = 'rgba(192, 57, 43, 0.45)';
+        icon = '❌';
+    } else if (titleLower.includes('warning') || titleLower.includes('validation')) {
+        headerBg = 'linear-gradient(135deg, #e67e22, #ca6f1e)';
+        btnBg = 'linear-gradient(135deg, #e67e22, #ca6f1e)';
+        btnShadow = 'rgba(230, 126, 34, 0.45)';
+        icon = '⚠️';
+    } else {
+        headerBg = 'linear-gradient(135deg, #000165, #1a1a7a)';
+        btnBg = 'linear-gradient(135deg, #000165, #1a1a7a)';
+        btnShadow = 'rgba(0, 1, 102, 0.4)';
+        icon = 'ℹ️';
+    }
+
+    const header = document.getElementById('customModalHeader');
+    const closeBtn = document.getElementById('modalCloseBtn');
+    if (header) header.style.background = headerBg;
+    if (closeBtn) {
+        closeBtn.style.background = btnBg;
+        closeBtn.style.boxShadow = `0 4px 14px ${btnShadow}`;
+    }
+
+    document.getElementById('modalIcon').textContent = icon;
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalMessage').textContent = message;
     overlay.style.display = 'flex';
