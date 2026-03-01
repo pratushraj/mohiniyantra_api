@@ -30,13 +30,15 @@ if (isset($currentGameTimeSlotRes) && !empty($currentGameTimeSlotRes)) {
 
 
 $previousGameResultsSql = mysqli_query($conn, "
-    SELECT CONCAT(gt.game_type_code, r.result_number) AS win_code, TIME_FORMAT(t.time, '%H:%i') AS time 
-    FROM results r
+    SELECT 
+        gt.game_type_name,
+        CONCAT(gt.game_type_code, IFNULL(r.result_number, '--')) AS win_code, 
+        TIME_FORMAT(IFNULL(t.time, '00:00:00'), '%H:%i') AS time 
+    FROM game_types gt
+    LEFT JOIN results r ON r.game_type_id = gt.game_type_id AND r.game_id = 3 
+        AND r.result_date = (SELECT result_date FROM results WHERE game_id = 3 ORDER BY result_id DESC LIMIT 1)
+        AND r.time_slot_id = (SELECT time_slot_id FROM results WHERE game_id = 3 ORDER BY result_id DESC LIMIT 1)
     LEFT JOIN time_slots t ON r.time_slot_id = t.time_slot_id
-    LEFT JOIN game_types gt ON gt.game_type_id = r.game_type_id
-    WHERE r.game_id = 3 
-    AND r.time_slot_id = (SELECT time_slot_id FROM results WHERE game_id = 3 ORDER BY result_id DESC LIMIT 1)
-    AND r.result_date = (SELECT result_date FROM results WHERE game_id = 3 ORDER BY result_id DESC LIMIT 1)
     ORDER BY gt.game_type_id ASC;
 ");
 $prevGameResults = [];

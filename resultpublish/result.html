@@ -14,13 +14,13 @@
         body {
             margin: 0;
             padding: 0;
-            background: yellow;
+            background: #f3728f !important;
             font-family: 'Questrial', Arial, sans-serif;
         }
 
         .top-bar {
             width: 100%;
-            background: yellow;
+            background: #f3728f !important;
             color: #444;
             position: relative;
             margin-bottom: 0;
@@ -35,7 +35,7 @@
             font-weight: 600;
             letter-spacing: 1px;
             padding: 12px 0;
-            background: yellow;
+            background: #f3728f !important;
         }
 
         .close-btn {
@@ -66,7 +66,7 @@
         .custom-header-row {
             display: flex;
             margin: 10px 10px;
-            background: yellow;
+            background: #f3728f !important;
             font-weight: 600;
         }
 
@@ -164,42 +164,7 @@
             }
         }
     </style>
-    <script>
-        (function () {
-            document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'F12') { e.preventDefault(); return false; }
-                if (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k'].includes(e.key)) { e.preventDefault(); return false; }
-                if (e.ctrlKey && ['U', 'u', 'S', 's', 'P', 'p'].includes(e.key)) { e.preventDefault(); return false; }
-            }, true);
-
-            try {
-                var noop = function () { };
-                ['log', 'warn', 'info', 'error', 'dir', 'table', 'trace', 'group', 'groupEnd', 'time', 'timeEnd', 'assert', 'clear', 'count', 'debug', 'dirxml', 'exception', 'profile', 'profileEnd'].forEach(function (m) {
-                    try { window.console[m] = noop; } catch (e) { }
-                });
-            } catch (e) { }
-
-            var _blocked = false;
-            setInterval(function () {
-                if (_blocked) return;
-                var t1 = +new Date();
-                (function () { })['constructor']('debugger')();
-                var t2 = +new Date();
-                if (t2 - t1 > 120) {
-                    _blocked = true;
-                    document.documentElement.innerHTML = '';
-                    window.location.replace('about:blank');
-                }
-            }, 800);
-
-            var _el = document.createElement('div');
-            Object.defineProperty(_el, 'id', {
-                get: function () { _blocked = true; document.documentElement.innerHTML = ''; window.location.replace('about:blank'); }
-            });
-        })();
-    </script>
 </head>
 
 <body>

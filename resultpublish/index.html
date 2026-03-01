@@ -11,7 +11,7 @@
     <script src="config.js"></script>
     <style>
         :root {
-            --bg-yellow: #ffff00;
+            --bg-yellow: #f3728f;
             --text-red: #ff0000;
             --border-blue: #00ccff;
         }
@@ -19,7 +19,7 @@
         body {
             margin: 0;
             padding: 0;
-            background: var(--bg-yellow);
+            background: #f3728f !important;
             font-family: 'Questrial', Arial, sans-serif;
             overflow-x: hidden;
         }
@@ -164,47 +164,7 @@
             }
         }
     </style>
-    <script>
-        (function () {
-            // 1. Disable right-click
-            document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
-            // 2. Block all DevTools keyboard shortcuts
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'F12') { e.preventDefault(); return false; }
-                if (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k'].includes(e.key)) { e.preventDefault(); return false; }
-                if (e.ctrlKey && ['U', 'u', 'S', 's', 'P', 'p'].includes(e.key)) { e.preventDefault(); return false; }
-            }, true);
-
-            // 3. Disable all console methods
-            try {
-                var noop = function () { };
-                ['log', 'warn', 'info', 'error', 'dir', 'table', 'trace', 'group', 'groupEnd', 'time', 'timeEnd', 'assert', 'clear', 'count', 'debug', 'dirxml', 'exception', 'profile', 'profileEnd'].forEach(function (m) {
-                    try { window.console[m] = noop; } catch (e) { }
-                });
-            } catch (e) { }
-
-            // 4. DevTools detection via debugger timing — if devtools open, page goes blank
-            var _blocked = false;
-            setInterval(function () {
-                if (_blocked) return;
-                var t1 = +new Date();
-                (function () { })['constructor']('debugger')();
-                var t2 = +new Date();
-                if (t2 - t1 > 120) {
-                    _blocked = true;
-                    document.documentElement.innerHTML = '';
-                    window.location.replace('about:blank');
-                }
-            }, 800);
-
-            // 5. Override toString method to detect element inspection trick
-            var _el = document.createElement('div');
-            Object.defineProperty(_el, 'id', {
-                get: function () { _blocked = true; document.documentElement.innerHTML = ''; window.location.replace('about:blank'); }
-            });
-        })();
-    </script>
 </head>
 
 <body>
@@ -295,7 +255,7 @@
             card.classList.add('shuffling');
             cardState[i].interval = setInterval(() => {
                 img.src = getRandomImage();
-            }, 100);
+            }, 70); // Faster shuffle
         }
 
         function stopShuffle(i, winCode) {
@@ -329,25 +289,32 @@
 
                 // Date/time bar
                 const d = new Date();
+                const todayStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                const apiDateStr = data.date || '';
+
                 document.getElementById('currentDate').innerText = `Date : ${formatDate(d)}`;
-                if (data.end_time) {
+
+                // Header Time Logic
+                if (apiDateStr > todayStr || d.getHours() < 8) {
+                    document.getElementById('nextTime').innerText = `Time : 08:00 AM`;
+                } else if (data.end_time) {
                     let [h, m] = data.end_time.substring(0, 5).split(':');
                     const ampm = +h >= 12 ? 'PM' : 'AM';
                     h = +h % 12 || 12;
                     document.getElementById('nextTime').innerText =
-                        `Time :${String(h).padStart(2, '0')}:${m} ${ampm}`;
+                        `Time : ${String(h).padStart(2, '0')}:${m} ${ampm}`;
                 }
 
                 const results = data.prev_game_results || [];
-                const todayDate = data.date || ''; // "YYYY-MM-DD" from API
 
                 for (let i = 0; i < 4; i++) {
                     const state = cardState[i];
                     const r = results[i];
 
-                    // Only treat as valid result if result_date == today's date
-                    const isToday = r && r.result_date && todayDate && (r.result_date === todayDate);
-                    const winCode = (isToday && r.win_code && r.win_code !== '--') ? r.win_code : null;
+                    // winCode for display, signature for detecting actual slot changes
+                    const winCode = (r && r.win_code && r.win_code !== '--') ? r.win_code : null;
+                    const resTime = (r && r.time) ? r.time : '';
+                    const signature = winCode ? `${winCode}-${resTime}` : null;
 
                     if (r && r.game_type_name) {
                         document.getElementById(`name-${i}`).innerText = r.game_type_name;
@@ -357,28 +324,28 @@
                         // ── FIRST LOAD ──
                         state.initialized = true;
                         if (winCode) {
-                            // Old result already exists → show immediately, no shuffle
-                            state.lastResult = winCode;
-                            stopShuffle(i, winCode); // just stops & sets text (no glow)
+                            // Show latest DB result (even if from previous slot) after 10s shuffle
+                            state.lastSig = signature;
+                            if (!state.interval) startShuffle(i);
+                            const ci = i, cw = winCode;
+                            setTimeout(() => stopShuffle(ci, cw), 10000);
                         } else {
-                            // No result yet → start shuffling and wait
-                            state.lastResult = null;
+                            state.lastSig = null;
                             startShuffle(i);
                         }
                     } else {
                         // ── SUBSEQUENT POLLS ──
                         if (!winCode) {
-                            // Still no result → keep shuffling
-                            state.lastResult = null;
+                            state.lastSig = null;
                             startShuffle(i);
-                        } else if (state.lastResult !== winCode) {
-                            // NEW result published while page is open → 10s dramatic shuffle then stop
-                            state.lastResult = winCode;
+                        } else if (state.lastSig !== signature) {
+                            // NEW results detected in DB → Trigger 10s Dramatic Reveal
+                            state.lastSig = signature;
                             if (!state.interval) startShuffle(i);
                             const ci = i, cw = winCode;
                             setTimeout(() => stopShuffle(ci, cw), 10000);
                         }
-                        // else: same result as before → nothing to do
+                        // else: Signature matches → Keep result visible (no re-shuffle)
                     }
                 }
             } catch (e) {
