@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <script src="config.js"></script>
     <style>
         :root {
@@ -52,7 +53,7 @@
             margin: 0 10px;
             font-weight: bold;
             font-size: 20px;
-            color: var(--text-red);
+            color: #ecd5b9;
         }
 
         .grid-container {
@@ -70,10 +71,10 @@
         }
 
         .product-title {
-            color: var(--text-red);
+            color: #ecd5b9;
             font-size: 26px;
             font-weight: 800;
-            margin-bottom: 12px;
+            margin-bottom: 22px;
         }
 
         .card-frame {
@@ -101,32 +102,57 @@
         }
 
         .card-label {
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 5px 8px 2px 8px;
-            text-shadow: 1px 1px 2px #000;
+            color: #ecd5b9;
+            /* Premium Beige/Gold */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            padding: 8px 10px 4px 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
         .card-code {
-            color: #fff;
+            color: #ffffff;
+            font-family: 'Questrial', sans-serif;
             font-size: 14px;
-            font-weight: bold;
-            padding: 2px 8px 6px 8px;
+            font-weight: 500;
+            padding: 2px 10px 10px 10px;
             text-shadow: 1px 1px 2px #000;
             text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         /* Shuffling glow effect */
         .shuffling .card-frame {
             animation: glowPulse 0.3s infinite alternate;
+        }
+
+        /* Modern Glassmorphic Labels */
+        .label-text {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-right: 10px;
+            vertical-align: middle;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-code .label-text {
+            font-size: 11px;
+            padding: 2px 8px;
+            letter-spacing: 1px;
         }
 
         @keyframes glowPulse {
@@ -137,6 +163,82 @@
             to {
                 box-shadow: 0 0 60px #ff3300, 0 0 100px #ff6600;
             }
+        }
+
+        /* Physical 3D Drum Meter Style */
+        .digit-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #111;
+            /* Gradient to simulate cylinder curvature */
+            background: linear-gradient(180deg, #000 0%, #222 25%, #222 75%, #000 100%);
+            color: #fff;
+            width: 25px;
+            height: 34px;
+            border-radius: 3px;
+            margin: 0 1.5px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                inset 0 4px 6px rgba(0, 0, 0, 0.8),
+                inset 0 -4px 6px rgba(0, 0, 0, 0.8);
+            vertical-align: middle;
+            position: relative;
+        }
+
+        .product-title .digit-box {
+            width: 32px;
+            height: 44px;
+            font-size: 30px;
+            color: #ffcc00;
+            /* Gold digits for Header */
+        }
+
+        .card-code .digit-box {
+            width: 20px;
+            height: 28px;
+            font-size: 18px;
+        }
+
+        .code-prefix {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a1a;
+            color: #ff4d4d;
+            /* Sharp Red for Prefix */
+            padding: 0 10px;
+            height: 34px;
+            border-radius: 4px;
+            margin-right: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            border: 1px solid #333;
+            box-shadow:
+                0 2px 5px rgba(0, 0, 0, 0.5),
+                inset 0 2px 2px rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            text-shadow: 0 0 8px rgba(255, 77, 77, 0.4);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .product-title .code-prefix {
+            height: 44px;
+            font-size: 26px;
+            padding: 0 12px;
+        }
+
+        .card-code .code-prefix {
+            height: 28px;
+            font-size: 16px;
+            padding: 0 6px;
         }
 
         @media (max-width: 900px) {
@@ -174,8 +276,12 @@
     </div>
 
     <div class="info-bar">
-        <div id="currentDate">Date : -- -- ----</div>
-        <div id="nextTime">Time : --:-- --</div>
+        <div id="currentDate"
+            style="margin: 0;font-family: 'Montserrat', sans-serif;font-size: 20px;letter-spacing: 2px;text-transform: uppercase;font-weight: 800;color: var(--premium-gold);text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+            Date : -- -- ----</div>
+        <div id="nextTime"
+            style="margin: 0;font-family: 'Montserrat', sans-serif;font-size: 20px;letter-spacing: 2px;text-transform: uppercase;font-weight: 800;color: var(--premium-gold);text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+            Time : --:-- --</div>
     </div>
 
     <div class="grid-container" id="cardGrid">
@@ -184,8 +290,8 @@
             <div class="product-title" id="title-0">Product Code :</div>
             <div class="card-frame">
                 <img class="card-img" id="img-0" src="assets/Kamala Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-0">NAVRATNA GOLDEN</div>
-                <div class="card-code" id="code-0">Product Code :- --</div>
+                <div class="card-label" id="name-0">NAVAGRAHA</div>
+                <div class="card-code" id="code-0">Product Code --</div>
             </div>
         </div>
 
@@ -193,8 +299,8 @@
             <div class="product-title" id="title-1">Product Code :</div>
             <div class="card-frame">
                 <img class="card-img" id="img-1" src="assets/Bhairav Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-1">BHAIRAV YANTRA</div>
-                <div class="card-code" id="code-1">Product Code :- --</div>
+                <div class="card-label" id="name-1">RAJARANI MOHINI</div>
+                <div class="card-code" id="code-1">Product Code --</div>
             </div>
         </div>
 
@@ -202,8 +308,8 @@
             <div class="product-title" id="title-2">Product Code :</div>
             <div class="card-frame">
                 <img class="card-img" id="img-2" src="assets/Matsya Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-2">MATSYA YANTRA</div>
-                <div class="card-code" id="code-2">Product Code :- --</div>
+                <div class="card-label" id="name-2">GAYATRI YANTRA</div>
+                <div class="card-code" id="code-2">Product Code --</div>
             </div>
         </div>
 
@@ -211,8 +317,8 @@
             <div class="product-title" id="title-3">Product Code :</div>
             <div class="card-frame">
                 <img class="card-img" id="img-3" src="assets/Ganesha Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-3">GANESHA YANTRA</div>
-                <div class="card-code" id="code-3">Product Code :- --</div>
+                <div class="card-label" id="name-3">RAJARANI HUNDRED</div>
+                <div class="card-code" id="code-3">Product Code --</div>
             </div>
         </div>
 
@@ -236,7 +342,6 @@
             'assets/Screenshot 2026-02-24 at 01-53-52 Shree yantra stock photos royalty-free images vectors video.png'
         ];
 
-        // Per-card state — initialized flag prevents treating old results as "new"
         const cardState = [
             { interval: null, lastResult: null, initialized: false },
             { interval: null, lastResult: null, initialized: false },
@@ -248,34 +353,77 @@
             return allImages[Math.floor(Math.random() * allImages.length)];
         }
 
-        function startShuffle(i) {
+        // Helper to get 4 unique random images from the pool
+        function getUniqueImages() {
+            const shuffled = [...allImages].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 4);
+        }
+
+        function startShuffle(i, targetCode) {
             if (cardState[i].interval) return;
             const card = document.getElementById(`card-${i}`);
             const img = document.getElementById(`img-${i}`);
+            const title = document.getElementById(`title-${i}`);
+            const code = document.getElementById(`code-${i}`);
+
             card.classList.add('shuffling');
+
+            // 1. Image Shuffle
             cardState[i].interval = setInterval(() => {
                 img.src = getRandomImage();
-            }, 70); // Faster shuffle
+            }, 70);
+
+            // 2. Pro Roller Logic (Petrol Meter Style)
+            let prefix = "NG"; // Default fallback
+            if (targetCode) {
+                const match = targetCode.match(/^([A-Za-z]+)/);
+                if (match) prefix = match[1];
+            }
+
+            cardState[i].textInterval = setInterval(() => {
+                const d1 = Math.floor(Math.random() * 10);
+                const d2 = Math.floor(Math.random() * 10);
+
+                const html = `<span class="code-prefix">${prefix}</span><span class="digit-box">${d1}</span><span class="digit-box">${d2}</span>`;
+                title.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
+                code.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
+            }, 60);
         }
 
-        function stopShuffle(i, winCode) {
+        function stopShuffle(i, winCode, finalImg) {
             const state = cardState[i];
             if (state.interval) {
                 clearInterval(state.interval);
                 state.interval = null;
             }
+            if (state.textInterval) {
+                clearInterval(state.textInterval);
+                state.textInterval = null;
+            }
+
             const card = document.getElementById(`card-${i}`);
             const img = document.getElementById(`img-${i}`);
             const code = document.getElementById(`code-${i}`);
             const title = document.getElementById(`title-${i}`);
+
             card.classList.remove('shuffling');
-            img.src = getRandomImage();
+            img.src = finalImg || getRandomImage();
+
             if (winCode) {
-                title.innerText = `Product Code : ${winCode}`;
-                code.innerText = `Product Code :- ${winCode}`;
+                const match = winCode.match(/^([A-Za-z]+)(.*)$/);
+                if (match) {
+                    const prefix = match[1];
+                    const digits = match[2].split('');
+                    const html = `<span class="code-prefix">${prefix}</span>${digits.map(d => `<span class="digit-box">${d}</span>`).join('')}`;
+                    title.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
+                    code.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
+                } else {
+                    title.innerHTML = `<span class="label-text">Product Code </span> ${winCode}`;
+                    code.innerHTML = `<span class="label-text">Product Code </span> ${winCode}`;
+                }
             } else {
-                title.innerText = 'Product Code :';
-                code.innerText = 'Product Code :- --';
+                title.innerHTML = '<span class="label-text">Product Code </span>';
+                code.innerHTML = '<span class="label-text">Product Code </span> --';
             }
         }
 
@@ -294,67 +442,60 @@
 
                 document.getElementById('currentDate').innerText = `Date : ${formatDate(d)}`;
 
-                // Header Time Logic
-                if (apiDateStr > todayStr || d.getHours() < 8) {
-                    document.getElementById('nextTime').innerText = `Time : 08:00 AM`;
-                } else if (data.end_time) {
-                    let [h, m] = data.end_time.substring(0, 5).split(':');
+                const results = data.prev_game_results || [];
+                const batchImages = getUniqueImages();
+
+                // Header Time Logic: Show the time of the LAST PUBLISHED result
+                if (results.length > 0 && results[0].time && results[0].time !== '00:00') {
+                    let [h, m] = results[0].time.split(':');
                     const ampm = +h >= 12 ? 'PM' : 'AM';
                     h = +h % 12 || 12;
-                    document.getElementById('nextTime').innerText =
-                        `Time : ${String(h).padStart(2, '0')}:${m} ${ampm}`;
+                    document.getElementById('nextTime').innerText = `Time : ${h}:${m} ${ampm}`;
+                } else {
+                    document.getElementById('nextTime').innerText = `Time : --:-- --`;
                 }
-
-                const results = data.prev_game_results || [];
 
                 for (let i = 0; i < 4; i++) {
                     const state = cardState[i];
                     const r = results[i];
+                    const finalImg = batchImages[i];
 
-                    // winCode for display, signature for detecting actual slot changes
                     const winCode = (r && r.win_code && r.win_code !== '--') ? r.win_code : null;
                     const resTime = (r && r.time) ? r.time : '';
                     const signature = winCode ? `${winCode}-${resTime}` : null;
 
-                    if (r && r.game_type_name) {
-                        document.getElementById(`name-${i}`).innerText = r.game_type_name;
-                    }
+                    // Determine the correct prefix (e.g., NG, AA, etc.) from the API data
+                    const currentPrefix = (r && r.win_code) ? r.win_code.match(/^([A-Za-z]+)/)?.[1] : "NG";
+
+
 
                     if (!state.initialized) {
-                        // ── FIRST LOAD ──
                         state.initialized = true;
                         if (winCode) {
-                            // Show latest DB result (even if from previous slot) after 10s shuffle
                             state.lastSig = signature;
-                            if (!state.interval) startShuffle(i);
+                            if (!state.interval) startShuffle(i, winCode);
                             const ci = i, cw = winCode;
-                            setTimeout(() => stopShuffle(ci, cw), 10000);
+                            setTimeout(() => stopShuffle(ci, cw, finalImg), 10000);
                         } else {
                             state.lastSig = null;
-                            startShuffle(i);
+                            startShuffle(i, currentPrefix);
                         }
                     } else {
-                        // ── SUBSEQUENT POLLS ──
                         if (!winCode) {
                             state.lastSig = null;
-                            startShuffle(i);
+                            if (!state.interval) startShuffle(i, currentPrefix);
                         } else if (state.lastSig !== signature) {
-                            // NEW results detected in DB → Trigger 10s Dramatic Reveal
                             state.lastSig = signature;
-                            if (!state.interval) startShuffle(i);
+                            if (!state.interval) startShuffle(i, winCode);
                             const ci = i, cw = winCode;
-                            setTimeout(() => stopShuffle(ci, cw), 10000);
+                            setTimeout(() => stopShuffle(ci, cw, finalImg), 10000);
                         }
-                        // else: Signature matches → Keep result visible (no re-shuffle)
                     }
                 }
             } catch (e) {
                 console.error('fetchDetails error:', e);
             }
         }
-
-        // All 4 cards start shuffling immediately on page open
-        for (let i = 0; i < 4; i++) startShuffle(i);
 
         fetchDetails();
         setInterval(fetchDetails, 30000);
