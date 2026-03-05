@@ -7,12 +7,51 @@
     <title>Coupon Details Report</title>
     <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
+    <style>
+        .report-header {
+            display: flex;
+            align-items: center;
+            background: #fff8c0;
+            padding: 10px 0;
+            position: relative;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .btn-close-report {
+            position: absolute;
+            right: 15px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            padding: 6px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        @media screen and (max-width: 900px) {
+            .btn-close-report {
+                padding: 4px 12px !important;
+                font-size: 13px !important;
+                right: 8px !important;
+            }
+
+            .report-header h2 {
+                font-size: 18px !important;
+                padding-right: 70px !important;
+                /* Avoid title overlap with button */
+            }
+        }
+    </style>
 </head>
 
 <body style="background-color: var(--card-bg);">
-    <div class="report-header" style="display: flex;">
-        <h2 style="margin: 0; flex: 1; text-align: center;">Coupon Details Report</h2>
-        <button class="action-btn btn-red" style="min-width: 80px;" onclick="history.back()">Close</button>
+    <div class="report-header">
+        <h2 style="margin: 0; flex: 1; text-align: center; color: #000166;">Coupon Details Report</h2>
+        <button class="btn-close-report" onclick="history.back()">Close</button>
     </div>
 
     <div class="report-filters">

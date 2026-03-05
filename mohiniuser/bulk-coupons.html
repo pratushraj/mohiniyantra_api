@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Dhankeshri Play - Bulk Coupons</title>
+    <title id="page-title">Dhankeshri Play - Bulk Coupons A</title>
     <link rel="stylesheet" href="style.css">
     <script src="config.js?v=3"></script>
     <script>
@@ -18,10 +18,12 @@
     </script>
 
     <style>
-        .input-cell {
-            padding: 2px !important;
-            font-size: 24px !important;
-            font-weight: 600 !important;
+        @media screen and (min-width: 901px) {
+            .input-cell {
+                padding: 2px !important;
+                font-size: 24px !important;
+                font-weight: 600 !important;
+            }
         }
     </style>
 </head>
@@ -65,17 +67,17 @@
                     <tr>
                         <th style="width: 200px;">Product Group</th>
                         <th style="width: 100px;">Gift Coin</th>
-                        <th>00-09</th>
-                        <th>10-19</th>
-                        <th>20-29</th>
-                        <th>30-39</th>
-                        <th>40-49</th>
-                        <th>50-59</th>
-                        <th>60-69</th>
-                        <th>70-79</th>
-                        <th>80-89</th>
-                        <th>90-99</th>
-                        <th>All</th>
+                        <th style="width: 75px;">00-09</th>
+                        <th style="width: 75px;">10-19</th>
+                        <th style="width: 75px;">20-29</th>
+                        <th style="width: 75px;">30-39</th>
+                        <th style="width: 75px;">40-49</th>
+                        <th style="width: 75px;">50-59</th>
+                        <th style="width: 75px;">60-69</th>
+                        <th style="width: 75px;">70-79</th>
+                        <th style="width: 75px;">80-89</th>
+                        <th style="width: 75px;">90-99</th>
+                        <th style="width: 75px;">All</th>
                         <th style="width: 80px;">Qty</th>
                         <th style="width: 80px;">Pts</th>
                         <th id="draw-time-header" style="width: 100px;">--:--</th>
@@ -88,25 +90,25 @@
                     <tr style="background-color: var(--header-bg); font-weight: bold;">
                         <td>All</td>
                         <td>-</td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="0" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="0" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="1" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="1" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="2" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="2" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="3" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="3" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="4" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="4" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="5" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="5" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="6" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="6" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="7" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="7" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="8" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="8" inputmode="none">
                         </td>
-                        <td><input type="text" class="input-cell global-range-input" data-col="9" inputmode="numeric">
+                        <td><input type="text" class="input-cell global-range-input" data-col="9" inputmode="none">
                         </td>
                         <td style="text-align: right;">TOTAL</td>
                         <td id="totalQty">0</td>
@@ -119,15 +121,18 @@
 
         <div class="bottom-actions">
             <button class="action-btn btn-green" onclick="location.href='upcoming.html'">
-                UPCOMMING [F1]
+                UPCOMMING <span class="shortcut">[F1]</span>
                 <span id="upcomingBadge" class="upcoming-badge" style="display: none;">0</span>
             </button>
-            <button class="action-btn btn-green" id="buyBtn">SUBMIT [F2]</button>
-            <button class="action-btn btn-red" onclick="clearAll()">CLEAR [F3]</button>
-            <button class="action-btn btn-red" id="cancelBtn">CANCEL [F4]</button>
-            <button class="action-btn btn-red" onclick="location.href='result.html'">MOHINI [F5]</button>
-            <button class="action-btn btn-red" onclick="location.href='report.html'">C. DETAILS [F6]</button>
-            <button class="action-btn btn-red" onclick="location.href='summary.html'">P. SUM [F7]</button>
+            <button class="action-btn btn-green" id="buyBtn">SUBMIT <span class="shortcut">[F2]</span></button>
+            <button class="action-btn btn-red" onclick="clearAll()">CLEAR <span class="shortcut">[F3]</span></button>
+            <button class="action-btn btn-red" id="cancelBtn">CANCEL <span class="shortcut">[F4]</span></button>
+            <button class="action-btn btn-red" onclick="location.href='result.html'">MOHINI <span
+                    class="shortcut">[F5]</span></button>
+            <button class="action-btn btn-red" onclick="location.href='report.html'">C. DETAILS <span
+                    class="shortcut">[F6]</span></button>
+            <button class="action-btn btn-red" onclick="location.href='summary.html'">P. SUM <span
+                    class="shortcut">[F7]</span></button>
         </div>
     </div>
 
@@ -153,10 +158,10 @@
 
                 let html = `<td>${group.name} ${group.code}</td><td>-</td>`;
                 for (let i = 0; i < 10; i++) {
-                    html += `<td><input type="text" class="input-cell range-input" inputmode="numeric" data-num="${i}"></td>`;
+                    html += `<td><input type="text" class="input-cell range-input" inputmode="none" data-num="${i}"></td>`;
                 }
                 html += `
-                    <td><input type="text" class="input-cell all-input" style="width: 50px;" inputmode="numeric"></td>
+                    <td><input type="text" class="input-cell all-input" style="width: 50px;" inputmode="none"></td>
                     <td class="qty-cell">0</td>
                     <td class="pts-cell">0.00</td>
                     <td class="result-cell" style="font-weight: bold; font-size: 14px;">-</td>
@@ -194,119 +199,7 @@
 
         initUI();
 
-        // Custom 4px Thick Cursor Implementation
-        let customCursor = null;
 
-        function createCustomCursor() {
-            if (!customCursor) {
-                customCursor = document.createElement('div');
-                customCursor.className = 'custom-cursor';
-                customCursor.style.zIndex = '1000';
-                document.body.appendChild(customCursor);
-            }
-        }
-
-        function updateCursorPosition(input) {
-            if (!customCursor) createCustomCursor();
-
-            const rect = input.getBoundingClientRect();
-            const inputStyle = window.getComputedStyle(input);
-
-            // Measure widths
-            const span = document.createElement('span');
-            span.style.font = inputStyle.font;
-            span.style.visibility = 'hidden';
-            span.style.position = 'absolute';
-            span.style.whiteSpace = 'pre';
-            document.body.appendChild(span);
-
-            // Full text width
-            span.textContent = input.value || '';
-            const fullTextWidth = span.offsetWidth;
-
-            // Text width up to cursor
-            const valueUpToCursor = input.value.substring(0, input.selectionStart);
-            span.textContent = valueUpToCursor || 'A';
-            const cursorTextWidth = input.value ? (span.textContent === valueUpToCursor ? span.offsetWidth : 0) : 0;
-            const spanHeight = Math.max(span.offsetHeight, 16);
-
-            document.body.removeChild(span);
-
-            // Set Height
-            customCursor.style.height = spanHeight + 'px';
-
-            // Vertical Position
-            const verticalCenter = rect.top + window.scrollY + (rect.height - spanHeight) / 2;
-            customCursor.style.top = verticalCenter + 'px';
-
-            // Horizontal Position (Handling Center Alignment)
-            const inputCenterX = rect.left + window.scrollX + (rect.width / 2);
-            let cursorLeft = inputCenterX - (fullTextWidth / 2) + cursorTextWidth;
-
-            // Center the 4px cursor over the insertion point
-            cursorLeft -= 2;
-
-            customCursor.style.left = cursorLeft + 'px';
-            customCursor.style.display = 'block';
-        }
-
-        // Track active input for cursor updates
-        let activeInput = null;
-
-        // Add focus/blur/input handlers to all input cells
-        document.addEventListener('focus', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('input-cell')) {
-                activeInput = e.target;
-                createCustomCursor();
-                updateCursorPosition(e.target);
-            }
-        }, true);
-
-        document.addEventListener('blur', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('input-cell') && customCursor) {
-                activeInput = null;
-                customCursor.style.display = 'none';
-            }
-        }, true);
-
-        // More responsive events
-        document.addEventListener('input', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('input-cell') && customCursor) {
-                requestAnimationFrame(() => updateCursorPosition(e.target));
-            }
-        }, true);
-
-        document.addEventListener('click', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('input-cell') && customCursor) {
-                requestAnimationFrame(() => updateCursorPosition(e.target));
-            }
-        }, true);
-
-        document.addEventListener('keydown', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('input-cell') && customCursor) {
-                requestAnimationFrame(() => updateCursorPosition(e.target));
-            }
-        }, true);
-
-        document.addEventListener('keyup', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('input-cell') && customCursor) {
-                requestAnimationFrame(() => updateCursorPosition(e.target));
-            }
-        }, true);
-
-        // Update on selection change
-        document.addEventListener('selectionchange', () => {
-            if (activeInput && customCursor) {
-                requestAnimationFrame(() => updateCursorPosition(activeInput));
-            }
-        });
-
-        // Update on scroll
-        window.addEventListener('scroll', () => {
-            if (activeInput && customCursor) {
-                requestAnimationFrame(() => updateCursorPosition(activeInput));
-            }
-        }, true);
 
         const pointRateInput = document.getElementById('pointRate');
         const totalQtyEl = document.getElementById('totalQty');
@@ -372,11 +265,35 @@
         document.getElementById('buyBtn').addEventListener('click', handleBuy);
         document.getElementById('cancelBtn').addEventListener('click', handleCancel);
 
+        // Measurer for smooth font resizing
+        const fontMeasurer = document.createElement('span');
+        fontMeasurer.style.visibility = 'hidden';
+        fontMeasurer.style.position = 'absolute';
+        fontMeasurer.style.whiteSpace = 'pre';
+        document.body.appendChild(fontMeasurer);
+
         function calculate() {
             let grandQty = 0;
             let grandPts = 0;
             const rate = parseFloat(pointRateInput ? pointRateInput.value : 1.0) || 1.0;
             const rows = document.querySelectorAll('.coupon-row');
+
+            function adjustFontSize(el, maxW, baseSize) {
+                const computedStyle = window.getComputedStyle(el);
+                let size = baseSize || parseInt(computedStyle.fontSize) || 19;
+                fontMeasurer.style.font = computedStyle.font;
+                fontMeasurer.style.fontSize = size + 'px';
+                fontMeasurer.textContent = el.textContent || el.value || '0';
+
+                while (fontMeasurer.offsetWidth > maxW && size > 8) {
+                    size--;
+                    fontMeasurer.style.fontSize = size + 'px';
+                }
+                const newSize = size + 'px';
+                if (el.style.fontSize !== newSize) {
+                    el.style.fontSize = newSize;
+                }
+            }
 
             rows.forEach(row => {
                 const rangeInputs = row.querySelectorAll('.range-input');
@@ -392,18 +309,46 @@
                 qtyCell.textContent = rowQty;
                 ptsCell.textContent = (rowPts * 10).toFixed(2);
 
+                adjustFontSize(qtyCell, qtyCell.clientWidth - 4);
+                adjustFontSize(ptsCell, ptsCell.clientWidth - 4);
+
                 grandQty += rowQty;
                 grandPts += (rowPts * 10);
             });
 
             totalQtyEl.textContent = grandQty;
             totalPtsEl.textContent = grandPts.toFixed(2);
+
+            adjustFontSize(totalQtyEl, totalQtyEl.clientWidth - 4);
+            adjustFontSize(totalPtsEl, totalPtsEl.clientWidth - 4);
         }
 
         document.addEventListener('input', (e) => {
             if (e.target && e.target.classList && (e.target.classList.contains('input-cell') || e.target.id === 'pointRate')) {
                 if (e.target.classList.contains('input-cell')) {
                     e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+                    // Restriction: Max 999
+                    if (parseInt(e.target.value) > 999) {
+                        e.target.value = '999';
+                    }
+
+                    // Smooth shrink active input
+                    const input = e.target;
+                    let size = 24;
+                    fontMeasurer.style.font = window.getComputedStyle(input).font;
+                    fontMeasurer.style.fontSize = size + 'px';
+                    fontMeasurer.textContent = input.value || '0';
+
+                    const maxW = input.clientWidth - 4;
+                    while (fontMeasurer.offsetWidth > maxW && size > 8) {
+                        size--;
+                        fontMeasurer.style.fontSize = size + 'px';
+                    }
+                    const newSize = size + 'px';
+                    if (input.style.fontSize !== newSize) {
+                        input.style.fontSize = newSize;
+                    }
                 }
 
                 // Incremental Add Logic for Bulk Inputs (on type)
@@ -416,12 +361,15 @@
                         const colIndex = e.target.dataset.col;
                         document.querySelectorAll('.coupon-row').forEach(row => {
                             const input = row.querySelectorAll('.range-input')[colIndex];
-                            const newVal = (parseInt(input.value) || 0) + delta;
+                            let newVal = (parseInt(input.value) || 0) + delta;
+                            // Also cap range/all-propagated values at 999
+                            if (newVal > 999) newVal = 999;
                             input.value = newVal > 0 ? newVal : '';
                         });
                     } else if (e.target.classList.contains('all-input')) {
                         e.target.closest('tr').querySelectorAll('.range-input').forEach(input => {
-                            const newVal = (parseInt(input.value) || 0) + delta;
+                            let newVal = (parseInt(input.value) || 0) + delta;
+                            if (newVal > 999) newVal = 999;
                             input.value = newVal > 0 ? newVal : '';
                         });
                     }
@@ -524,11 +472,162 @@
             }
         });
 
+        // Custom Cursor & Keypad Logic
+        let customCursor = null;
+        let currentActiveInput = null;
+
+        function createCustomCursor() {
+            if (!customCursor) {
+                customCursor = document.createElement('div');
+                customCursor.className = 'custom-cursor';
+                customCursor.style.zIndex = '1000';
+                document.body.appendChild(customCursor);
+            }
+            customCursor.style.display = 'block';
+        }
+
+        function updateCursorPosition(input) {
+            if (!input || !customCursor) return;
+            const rect = input.getBoundingClientRect();
+            const inputStyle = window.getComputedStyle(input);
+            fontMeasurer.style.font = inputStyle.font;
+            fontMeasurer.style.fontSize = inputStyle.fontSize;
+            fontMeasurer.style.fontWeight = inputStyle.fontWeight;
+
+            const fullText = input.value || "";
+            const textBeforeCursor = fullText.substring(0, input.selectionStart);
+
+            fontMeasurer.textContent = textBeforeCursor;
+            const textWidthBefore = fontMeasurer.offsetWidth;
+
+            fontMeasurer.textContent = fullText || " ";
+            const totalTextWidth = fontMeasurer.offsetWidth;
+
+            let startX = rect.left + window.scrollX;
+            const textAlign = inputStyle.textAlign;
+
+            if (textAlign === 'center') {
+                startX += (rect.width - totalTextWidth) / 2;
+            } else {
+                startX += (parseInt(inputStyle.paddingLeft) || 0);
+            }
+
+            customCursor.style.left = (startX + textWidthBefore - 1) + 'px';
+
+            const cursorHeight = parseFloat(window.getComputedStyle(customCursor).height) || 19;
+            customCursor.style.top = (rect.top + window.scrollY + (rect.height - cursorHeight) / 2) + 'px';
+            customCursor.style.display = 'block';
+        }
+
+        document.addEventListener('focusin', (e) => {
+            if (e.target.classList && e.target.classList.contains('input-cell')) {
+                currentActiveInput = e.target;
+                const keypad = document.getElementById('customKeypad');
+                if (keypad) keypad.style.display = 'flex';
+                createCustomCursor();
+                updateCursorPosition(e.target);
+                // Ensure inputmode is 'none' when focused, unless toggled
+                if (currentActiveInput.getAttribute('inputmode') !== 'numeric') {
+                    currentActiveInput.setAttribute('inputmode', 'none');
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList && e.target.classList.contains('input-cell')) {
+                const keypad = document.getElementById('customKeypad');
+                if (keypad) keypad.style.display = 'flex';
+            }
+        });
+
+        document.addEventListener('blur', (e) => {
+            if (e.target.classList && e.target.classList.contains('input-cell') && customCursor) {
+                setTimeout(() => {
+                    if (document.activeElement !== e.target &&
+                        !document.activeElement.classList.contains('input-cell') &&
+                        !document.activeElement.classList.contains('keypad-btn')) {
+                        customCursor.style.display = 'none';
+                        currentActiveInput = null;
+                    }
+                }, 100);
+            }
+        }, true);
+
+        ['input', 'click', 'keydown', 'keyup'].forEach(ev => {
+            document.addEventListener(ev, (e) => {
+                if (e.target.classList && e.target.classList.contains('input-cell')) {
+                    requestAnimationFrame(() => updateCursorPosition(e.target));
+                }
+            }, true);
+        });
+
+        document.addEventListener('selectionchange', () => {
+            if (currentActiveInput && customCursor) requestAnimationFrame(() => updateCursorPosition(currentActiveInput));
+        });
+
+        window.handleKeypad = function (key) {
+            if (!currentActiveInput) return;
+            const input = currentActiveInput;
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            let val = input.value;
+
+            if (key === 'delete') {
+                if (start === end && start > 0) {
+                    input.value = val.slice(0, start - 1) + val.slice(start);
+                    input.setSelectionRange(start - 1, start - 1);
+                } else {
+                    input.value = val.slice(0, start) + val.slice(end);
+                    input.setSelectionRange(start, start);
+                }
+            } else if (key === 'toggle') {
+                const currentMode = input.getAttribute('inputmode');
+                input.setAttribute('inputmode', currentMode === 'none' ? 'numeric' : 'none');
+                input.blur();
+                setTimeout(() => input.focus(), 10);
+            } else if (key === 'hide') {
+                const keypad = document.getElementById('customKeypad');
+                if (keypad) keypad.style.display = 'none';
+            } else {
+                if (val.length < 3 || (end - start) > 0) {
+                    input.value = val.slice(0, start) + key + val.slice(end);
+                    input.setSelectionRange(start + 1, start + 1);
+                }
+            }
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+
         calculate();
     </script>
-</body>
 
-</html>
+    <!-- Custom Keypad UI -->
+    <div class="custom-keypad" id="customKeypad">
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('1')">1</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('2')">2</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('3')">3</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('4')">4</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('5')">5</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('6')">6</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('7')">7</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('8')">8</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('9')">9</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('0')">0</button>
+        <button class="keypad-btn delete-btn" onpointerdown="event.preventDefault(); handleKeypad('delete')">
+            <svg fill="currentColor" width="20" height="20" viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg>
+        </button>
+        <button class="keypad-btn hide-btn" onpointerdown="event.preventDefault(); handleKeypad('hide')"
+            style="display: flex; flex-direction: column; gap: 2px; padding: 4px 0;">
+            <svg fill="currentColor" width="18" height="18" viewBox="0 0 24 24">
+                <path
+                    d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z" />
+            </svg>
+            <svg fill="currentColor" width="12" height="12" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+            </svg>
+        </button>
+    </div>
 </body>
 
 </html>

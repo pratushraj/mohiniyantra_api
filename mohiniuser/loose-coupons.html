@@ -17,15 +17,17 @@
         });
     </script>
     <style>
-        .input-cell {
-            padding: 2px !important;
-            font-size: 24px !important;
-            font-weight: 600 !important;
+        @media screen and (min-width: 901px) {
+            .input-cell {
+                padding: 2px !important;
+                font-size: 24px !important;
+                font-weight: 600 !important;
+            }
         }
     </style>
 </head>
 
-<body>
+<body class="loose-coupons-page">
     <div class="top-bar">
         <div class="version-info">0.0.12</div>
         <div class="top-info">
@@ -82,16 +84,20 @@
 
         <div class="bottom-actions" style="margin-top: 10px;">
             <button class="action-btn btn-green" onclick="location.href='upcoming.html'">
-                UPCOMMING [F1]
+                UPCOMMING <span class="shortcut">[F1]</span>
                 <span id="upcomingBadge" class="upcoming-badge" style="display: none;">0</span>
             </button>
-            <button class="action-btn btn-green" onclick="handleBuy()">SUBMIT [F2]</button>
+            <button class="action-btn btn-green" onclick="handleBuy()">SUBMIT <span
+                    class="shortcut">[F2]</span></button>
             <button class="action-btn btn-red" onclick="clearAll(); for(let key in tabState) tabState[key]={};">CLEAR
-                [F3]</button>
-            <button class="action-btn btn-red" id="cancelBtn">CANCEL [F4]</button>
-            <button class="action-btn btn-red" onclick="location.href='result.html'">MOHINI [F5]</button>
-            <button class="action-btn btn-red" onclick="location.href='report.html'">C. DETAILS [F6]</button>
-            <button class="action-btn btn-red" onclick="location.href='summary.html'">P. SUM [F7]</button>
+                <span class="shortcut">[F3]</span></button>
+            <button class="action-btn btn-red" id="cancelBtn">CANCEL <span class="shortcut">[F4]</span></button>
+            <button class="action-btn btn-red" onclick="location.href='result.html'">MOHINI <span
+                    class="shortcut">[F5]</span></button>
+            <button class="action-btn btn-red" onclick="location.href='report.html'">C. DETAILS <span
+                    class="shortcut">[F6]</span></button>
+            <button class="action-btn btn-red" onclick="location.href='summary.html'">P. SUM <span
+                    class="shortcut">[F7]</span></button>
         </div>
     </div>
 
@@ -273,6 +279,8 @@
                     textDiv.style.justifyContent = 'center';
                     textDiv.style.fontWeight = 'bold';
                     textDiv.style.fontSize = '18px';
+                    textDiv.style.whiteSpace = 'nowrap';
+                    textDiv.style.overflow = 'hidden';
                     grid.appendChild(textDiv);
                     return;
                 }
@@ -283,6 +291,7 @@
                 input.style.width = '55%';
                 input.style.margin = '0px auto';
                 input.type = 'text';
+                input.inputMode = 'none';
                 input.placeholder = val;
 
                 if (rowIndex < 10 && colIndex < 10) {
@@ -303,8 +312,12 @@
             });
         });
 
-        // Custom Cursor Implementation
+
+
+        // Custom Cursor & Keypad Logic
         let customCursor = null;
+        let currentActiveInput = null;
+
         function createCustomCursor() {
             if (!customCursor) {
                 customCursor = document.createElement('div');
@@ -312,63 +325,127 @@
                 customCursor.style.zIndex = '1000';
                 document.body.appendChild(customCursor);
             }
-        }
-
-        function updateCursorPosition(input) {
-            if (!customCursor) createCustomCursor();
-            const rect = input.getBoundingClientRect();
-            const inputStyle = window.getComputedStyle(input);
-            const span = document.createElement('span');
-            span.style.font = inputStyle.font;
-            span.style.visibility = 'hidden';
-            span.style.position = 'absolute';
-            span.style.whiteSpace = 'pre';
-            document.body.appendChild(span);
-            span.textContent = input.value || '';
-            const fullTextWidth = span.offsetWidth;
-            const valueUpToCursor = input.value.substring(0, input.selectionStart);
-            span.textContent = valueUpToCursor || '0';
-            const cursorTextWidth = input.value ? (span.textContent === valueUpToCursor ? span.offsetWidth : 0) : 0;
-            const spanHeight = Math.max(span.offsetHeight, 16);
-            document.body.removeChild(span);
-            customCursor.style.height = spanHeight + 'px';
-            const verticalCenter = rect.top + window.scrollY + (rect.height - spanHeight) / 2;
-            customCursor.style.top = verticalCenter + 'px';
-            const inputCenterX = rect.left + window.scrollX + (rect.width / 2);
-            let cursorLeft = inputCenterX - (fullTextWidth / 2) + cursorTextWidth - 2;
-            customCursor.style.left = cursorLeft + 'px';
             customCursor.style.display = 'block';
         }
 
-        let activeInput = null;
-        document.addEventListener('focus', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('grid-input')) {
-                activeInput = e.target;
+        function updateCursorPosition(input) {
+            if (!input || !customCursor) return;
+            const rect = input.getBoundingClientRect();
+            const inputStyle = window.getComputedStyle(input);
+            fontMeasurer.style.font = inputStyle.font;
+            fontMeasurer.style.fontSize = inputStyle.fontSize;
+            fontMeasurer.style.fontWeight = inputStyle.fontWeight;
+
+            const fullText = input.value || "";
+            const textBeforeCursor = fullText.substring(0, input.selectionStart);
+
+            fontMeasurer.textContent = textBeforeCursor;
+            const textWidthBefore = fontMeasurer.offsetWidth;
+
+            fontMeasurer.textContent = fullText || " ";
+            const totalTextWidth = fontMeasurer.offsetWidth;
+
+            let startX = rect.left + window.scrollX;
+            const textAlign = inputStyle.textAlign;
+
+            if (textAlign === 'center') {
+                startX += (rect.width - totalTextWidth) / 2;
+            } else {
+                startX += (parseInt(inputStyle.paddingLeft) || 0);
+            }
+
+            customCursor.style.left = (startX + textWidthBefore - 1) + 'px';
+
+            const cursorHeight = parseFloat(window.getComputedStyle(customCursor).height) || 16;
+            customCursor.style.top = (rect.top + window.scrollY + (rect.height - cursorHeight) / 2) + 'px';
+            customCursor.style.display = 'block';
+        }
+
+        document.addEventListener('focusin', (e) => {
+            if (e.target.classList && e.target.classList.contains('grid-input')) {
+                currentActiveInput = e.target;
+                const keypad = document.getElementById('customKeypad');
+                if (keypad) keypad.style.display = 'flex';
                 createCustomCursor();
                 updateCursorPosition(e.target);
+                if (currentActiveInput.getAttribute('inputmode') !== 'numeric') {
+                    currentActiveInput.setAttribute('inputmode', 'none');
+                }
             }
-        }, true);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList && e.target.classList.contains('grid-input')) {
+                const keypad = document.getElementById('customKeypad');
+                if (keypad) keypad.style.display = 'flex';
+            }
+        });
+
         document.addEventListener('blur', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('grid-input') && customCursor) {
-                activeInput = null;
-                customCursor.style.display = 'none';
+            if (e.target.classList && e.target.classList.contains('grid-input') && customCursor) {
+                setTimeout(() => {
+                    if (document.activeElement !== e.target &&
+                        !document.activeElement.classList.contains('grid-input') &&
+                        !document.activeElement.classList.contains('keypad-btn')) {
+                        customCursor.style.display = 'none';
+                        currentActiveInput = null;
+                    }
+                }, 100);
             }
         }, true);
 
         ['input', 'click', 'keydown', 'keyup'].forEach(ev => {
             document.addEventListener(ev, (e) => {
-                if (e.target && e.target.classList && e.target.classList.contains('grid-input') && customCursor) {
+                if (e.target.classList && e.target.classList.contains('grid-input')) {
                     requestAnimationFrame(() => updateCursorPosition(e.target));
                 }
             }, true);
         });
 
         document.addEventListener('selectionchange', () => {
-            if (activeInput && customCursor) requestAnimationFrame(() => updateCursorPosition(activeInput));
+            if (currentActiveInput && customCursor) requestAnimationFrame(() => updateCursorPosition(currentActiveInput));
         });
-        window.addEventListener('scroll', () => {
-            if (activeInput && customCursor) requestAnimationFrame(() => updateCursorPosition(activeInput));
-        }, true);
+
+        window.handleKeypad = function (key) {
+            if (key === 'hide') {
+                const keypad = document.getElementById('customKeypad');
+                if (keypad) keypad.style.display = 'none';
+                return;
+            }
+            if (!currentActiveInput) return;
+            const input = currentActiveInput;
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            let val = input.value;
+
+            if (key === 'delete') {
+                if (start === end && start > 0) {
+                    input.value = val.slice(0, start - 1) + val.slice(start);
+                    input.setSelectionRange(start - 1, start - 1);
+                } else {
+                    input.value = val.slice(0, start) + val.slice(end);
+                    input.setSelectionRange(start, start);
+                }
+            } else if (key === 'toggle') {
+                const currentMode = input.getAttribute('inputmode');
+                input.setAttribute('inputmode', currentMode === 'none' ? 'numeric' : 'none');
+                input.blur();
+                setTimeout(() => input.focus(), 10);
+            } else {
+                if (val.length < 3 || (end - start) > 0) {
+                    input.value = val.slice(0, start) + key + val.slice(end);
+                    input.setSelectionRange(start + 1, start + 1);
+                }
+            }
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+
+        // Measurer for smooth font resizing
+        const fontMeasurer = document.createElement('span');
+        fontMeasurer.style.visibility = 'hidden';
+        fontMeasurer.style.position = 'absolute';
+        fontMeasurer.style.whiteSpace = 'pre';
+        document.body.appendChild(fontMeasurer);
 
         function updateTotals() {
             let totalQty = 0;
@@ -376,9 +453,34 @@
                 totalQty += (parseInt(input.value) || 0);
             });
             const points = (totalQty * POINT_RATE).toFixed(2);
-            document.getElementById('qtyDisplay').textContent = `Qty. ${totalQty}`;
-            document.getElementById('ptsDisplay').textContent = `Pts ${(totalQty * POINT_RATE).toFixed(2)}`;
+            const qtyEl = document.getElementById('qtyDisplay');
+            const ptsEl = document.getElementById('ptsDisplay');
+
+            qtyEl.textContent = `Qty. ${totalQty}`;
+            ptsEl.textContent = `Pts ${points}`;
+
+            function adjustFontSize(el, maxW, baseSize) {
+                let size = baseSize || 18;
+                fontMeasurer.style.font = window.getComputedStyle(el).font;
+                fontMeasurer.style.fontSize = size + 'px';
+                fontMeasurer.textContent = el.textContent || el.value || '0';
+                while (fontMeasurer.offsetWidth > maxW && size > 8) {
+                    size--;
+                    fontMeasurer.style.fontSize = size + 'px';
+                }
+                const newSize = size + 'px';
+                if (el.style.fontSize !== newSize) {
+                    el.style.fontSize = newSize;
+                }
+            }
+
+            if (qtyEl.offsetWidth > 0) {
+                adjustFontSize(qtyEl, qtyEl.offsetWidth - 4);
+                adjustFontSize(ptsEl, ptsEl.offsetWidth - 4);
+            }
         }
+
+        updateTotals();
 
         function clearAll() {
             document.querySelectorAll('.grid-input').forEach(input => input.value = '');
@@ -388,6 +490,31 @@
         document.addEventListener('input', (e) => {
             if (e.target && e.target.classList && e.target.classList.contains('grid-input')) {
                 e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+                // Restriction: Max 999
+                if (parseInt(e.target.value) > 999) {
+                    e.target.value = '999';
+                }
+
+                // Smooth shrink active input
+                const input = e.target;
+                let size = 24;
+                if (input.classList.contains('number-input')) size = 16;
+
+                fontMeasurer.style.font = window.getComputedStyle(input).font;
+                fontMeasurer.style.fontSize = size + 'px';
+                fontMeasurer.textContent = input.value || '0';
+
+                const maxW = input.clientWidth - 4;
+                while (fontMeasurer.offsetWidth > maxW && size > 8) {
+                    size--;
+                    fontMeasurer.style.fontSize = size + 'px';
+                }
+                const newSize = size + 'px';
+                if (input.style.fontSize !== newSize) {
+                    input.style.fontSize = newSize;
+                }
+
                 if (e.target.classList.contains('fill-column') || e.target.classList.contains('fill-row') || e.target.classList.contains('fill-digit-sum')) {
                     const currentVal = parseInt(e.target.value) || 0;
                     const prevVal = parseInt(e.target.getAttribute('data-prev-val')) || 0;
@@ -395,12 +522,16 @@
                     if (e.target.classList.contains('fill-column')) {
                         const targetRow = parseInt(e.target.getAttribute('data-target-index'));
                         document.querySelectorAll(`.number-input[data-row="${targetRow}"]`).forEach(ni => {
-                            const nv = (parseInt(ni.value) || 0) + delta; ni.value = nv > 0 ? nv : '';
+                            let nv = (parseInt(ni.value) || 0) + delta;
+                            if (nv > 999) nv = 999;
+                            ni.value = nv > 0 ? nv : '';
                         });
                     } else if (e.target.classList.contains('fill-row')) {
                         const targetCol = parseInt(e.target.getAttribute('data-target-index'));
                         document.querySelectorAll(`.number-input[data-col="${targetCol}"]`).forEach(ni => {
-                            const nv = (parseInt(ni.value) || 0) + delta; ni.value = nv > 0 ? nv : '';
+                            let nv = (parseInt(ni.value) || 0) + delta;
+                            if (nv > 999) nv = 999;
+                            ni.value = nv > 0 ? nv : '';
                         });
                     } else if (e.target.classList.contains('fill-digit-sum')) {
                         const targetDigit = parseInt(e.target.getAttribute('data-target-index'));
@@ -408,7 +539,9 @@
                             const tens = parseInt(ni.getAttribute('data-row'));
                             const units = parseInt(ni.getAttribute('colIndex') || ni.getAttribute('data-col'));
                             if ((tens + units) % 10 === targetDigit) {
-                                const nv = (parseInt(ni.value) || 0) + delta; ni.value = nv > 0 ? nv : '';
+                                let nv = (parseInt(ni.value) || 0) + delta;
+                                if (nv > 999) nv = 999;
+                                ni.value = nv > 0 ? nv : '';
                             }
                         });
                     }
@@ -464,7 +597,38 @@
             else if (e.key === 'F7') { e.preventDefault(); location.href = 'summary.html'; }
             else if (e.key.toLowerCase() === 'q' && e.target.tagName !== 'INPUT') location.href = 'index.html';
         });
+
+        updateTotals();
     </script>
+
+    <!-- Custom Keypad UI -->
+    <div class="custom-keypad" id="customKeypad">
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('1')">1</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('2')">2</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('3')">3</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('4')">4</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('5')">5</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('6')">6</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('7')">7</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('8')">8</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('9')">9</button>
+        <button class="keypad-btn" onpointerdown="event.preventDefault(); handleKeypad('0')">0</button>
+        <button class="keypad-btn delete-btn" onpointerdown="event.preventDefault(); handleKeypad('delete')">
+            <svg fill="currentColor" width="20" height="20" viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg>
+        </button>
+        <button class="keypad-btn hide-btn" onpointerdown="event.preventDefault(); handleKeypad('hide')"
+            style="display: flex; flex-direction: column; gap: 2px; padding: 4px 0;">
+            <svg fill="currentColor" width="18" height="18" viewBox="0 0 24 24">
+                <path
+                    d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z" />
+            </svg>
+            <svg fill="currentColor" width="12" height="12" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+            </svg>
+        </button>
+    </div>
 </body>
 
 </html>

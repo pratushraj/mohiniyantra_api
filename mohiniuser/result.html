@@ -190,7 +190,7 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 320px;
+            width: 100%;
             position: relative;
         }
 
@@ -290,6 +290,138 @@
             font-size: 24px;
             margin-bottom: 10px;
             color: #007bff;
+        }
+
+        /* Mobile Responsiveness */
+        @media screen and (max-width: 600px) {
+            .btn-close-red {
+                padding: 2px 15px;
+                font-size: 18px;
+                border-radius: 4px;
+            }
+
+            .day-label {
+                padding-bottom: 0px;
+            }
+
+            .date-display-box {
+                font-size: 24px;
+                padding: 10px 15px;
+                min-width: 200px;
+            }
+
+            .calendar-icon-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 24px;
+            }
+
+            .search-ok-btn {
+                width: 100%;
+                max-width: 280px;
+                padding: 8px 0;
+                font-size: 24px;
+            }
+
+            .res-date-bar {
+                font-size: 22px;
+                padding: 5px 0;
+            }
+
+            .head-gift {
+                font-size: 13px;
+                padding: 6px 2px;
+            }
+
+            .head-yantra {
+                font-size: 16px;
+                padding: 6px 2px;
+            }
+
+            .cell-time,
+            .cell-val {
+                font-size: 15px;
+                padding: 6px 2px;
+            }
+
+            .res-container {
+                margin: 0 5px 5px 5px;
+                padding: 5px;
+            }
+
+            .calendar-card {
+                width: 280px;
+                padding: 15px;
+            }
+
+            .calendar-day,
+            .nav-arrow {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+
+            .current-month-year {
+                font-size: 16px;
+            }
+
+            .calendar-card-ok {
+                padding: 6px 30px;
+                font-size: 16px;
+            }
+
+            .date-display-header {
+                font-size: 22px;
+            }
+
+            .calendar-card-footer {
+                margin-top: 0px;
+            }
+
+            #popupHeaderDate {
+                display: none;
+            }
+        }
+
+        /* Landscape orientation specifically for height */
+        @media screen and (max-height: 500px) {
+            .search-screen {
+                gap: 15px;
+            }
+
+            .day-label {
+                padding-bottom: 0px;
+            }
+
+            #popupHeaderDate {
+                display: none;
+            }
+
+            .calendar-card-footer {
+                margin-top: 0px;
+            }
+
+            .head-gift {
+                font-size: 25px;
+                padding: 6px 2px;
+            }
+
+            .head-yantra {
+                font-size: 25px;
+                padding: 6px 2px;
+            }
+
+            .calendar-card {
+                padding: 10px;
+            }
+
+            .calendar-nav {
+                margin-bottom: 10px;
+            }
+
+            .calendar-grid {
+                gap: 5px;
+            }
         }
     </style>
 </head>

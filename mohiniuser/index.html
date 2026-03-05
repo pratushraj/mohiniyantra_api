@@ -15,12 +15,97 @@
                 infoDiv.innerHTML = `
                     <div class="top-info">
                         <span>Welcome : ${appGlobalConfig.unique_id}</span>
+                        <br>
                         <span>Balance Point : ${appGlobalConfig.balance}</span>
                     </div>
                 `;
             }
         });
     </script>
+    <style>
+        .top-info {
+            text-align: center;
+            color: #000166;
+            font-size: 18px;
+            padding-top: 10px;
+        }
+
+        .btn-change-pw {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .btn-logout {
+            position: fixed;
+            bottom: 50px;
+            right: 50px;
+            padding: 15px 40px;
+            font-size: 20px;
+        }
+
+        @media screen and (max-width: 600px) {
+            .nav-main-btn {
+                font-size: 28px !important;
+                padding: 12px 30px !important;
+                margin-bottom: 5rem !important;
+            }
+
+            .top-info {
+                font-size: 14px;
+            }
+
+            .btn-change-pw {
+                bottom: 20px !important;
+                left: 10px !important;
+                transform: none !important;
+                font-size: 14px !important;
+                padding: 10px 15px !important;
+            }
+
+            .btn-logout {
+                bottom: 20px !important;
+                right: 10px !important;
+                font-size: 14px !important;
+                padding: 10px 15px !important;
+            }
+        }
+
+        /* Landscape Mobile Fix */
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            .nav-main-btn {
+                font-size: 24px !important;
+                padding: 8px 30px !important;
+                margin-bottom: 2rem !important;
+                /* Prevent pushing out of screen */
+            }
+
+            .top-info {
+                font-size: 14px;
+                padding-top: 5px;
+            }
+
+            .btn-change-pw {
+                bottom: 10px !important;
+                left: 20px !important;
+                transform: none !important;
+                font-size: 13px !important;
+                padding: 8px 15px !important;
+            }
+
+            .action-btn {
+                height: auto !important;
+            }
+
+            .btn-logout {
+                bottom: 10px !important;
+                right: 20px !important;
+                font-size: 13px !important;
+                padding: 8px 15px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -32,12 +117,10 @@
         <button class="nav-main-btn" onclick="location.href='bulk-coupons.html'">Mohini</button>
 
 
-        <button class="action-btn btn-red" style="position:fixed; bottom:50px; left:50%; transform:translateX(-50%);"
-            onclick="location.href='change-password.html'">Change Password</button>
+        <button class="action-btn btn-red btn-change-pw" onclick="location.href='change-password.html'">Change
+            Password</button>
 
-        <button class="action-btn btn-red"
-            style="position:fixed; bottom:50px; right:50px; padding:15px 40px; font-size:20px;"
-            onclick="logout()">Logout</button>
+        <button class="action-btn btn-red btn-logout" onclick="logout()">Logout</button>
     </div>
 
     <script>
