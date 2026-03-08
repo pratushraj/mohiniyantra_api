@@ -19,6 +19,16 @@
             --premium-gold: #ecd5b9;
         }
 
+        .margin-0-5 {
+            margin-top: 0.5em;
+        }
+
+        .d-flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -90,7 +100,7 @@
 
         .card-frame {
             width: 320px;
-            height: 320px;
+            min-height: 325px;
             border: 5px solid #111;
             padding: 8px 14px;
             border-radius: 12px;
@@ -100,6 +110,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            align-items: center;
         }
 
         .card-img {
@@ -109,30 +120,73 @@
             border: 2px solid gold;
             border-radius: 4px;
             display: block;
-            height: 200px;
+            height: 260px;
         }
 
         .card-label {
+            position: absolute;
+            /* top: 12px; */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            /* background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1); */
+            border-radius: 6px;
             color: #ecd5b9;
-            /* Premium Beige/Gold */
             font-family: 'Montserrat', sans-serif;
             font-size: 16px;
             font-weight: 800;
-            padding: 8px 10px 4px 10px;
+            padding: 6px 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             text-align: center;
             letter-spacing: 1.5px;
             text-transform: uppercase;
+            z-index: 11;
         }
 
         .card-code {
-            color: #ffffff;
+            position: absolute;
+            /* bottom: 104px; */
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            /* background: rgba(0, 0, 0, 0.5); */
+            /* backdrop-filter: blur(8px); */
+            /* -webkit-backdrop-filter: blur(8px); */
+            /* border: 1px solid rgba(255, 255, 255, 0.2); */
+            border-radius: 10px;
+            padding: 8px 4px !important;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); */
             font-family: 'Questrial', sans-serif;
             font-size: 14px;
-            font-weight: 500;
-            padding: 2px 10px 10px 10px;
-            text-shadow: 1px 1px 2px #000;
+            color: #fff;
+        }
+
+        .img-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .yantra-hint {
+            color: #ffffff;
+            font-family: 'Questrial', sans-serif;
+            font-size: 22px;
+            font-weight: 1000;
+            margin-top: 12px;
             text-align: center;
+            text-shadow: 3px 1px 2px #f00, -1px -1px 0 #000;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
         }
 
         /* Shuffling glow effect */
@@ -147,7 +201,7 @@
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+            color: red;
             padding: 4px 12px;
             border-radius: 4px;
             font-size: 18px;
@@ -161,9 +215,10 @@
         }
 
         .card-code .label-text {
-            font-size: 11px;
+            font-size: 16px;
             padding: 2px 8px;
             letter-spacing: 1px;
+            color: purple;
         }
 
         @keyframes glowPulse {
@@ -183,8 +238,9 @@
             justify-content: center;
             background-color: #111;
             /* Gradient to simulate cylinder curvature */
-            background: linear-gradient(180deg, #000 0%, #222 25%, #222 75%, #000 100%);
-            color: #fff;
+            /* background: linear-gradient(180deg, #000 0%, #222 25%, #222 75%, #000 100%); */
+            background-color: #0404c7;
+            color: white;
             width: 25px;
             height: 34px;
             border-radius: 3px;
@@ -192,12 +248,12 @@
             font-family: 'Montserrat', sans-serif;
             font-size: 24px;
             font-weight: 800;
-            border-left: 1px solid #333;
+            /* border-left: 1px solid #333;
             border-right: 1px solid #333;
             box-shadow:
                 0 2px 4px rgba(0, 0, 0, 0.5),
                 inset 0 4px 6px rgba(0, 0, 0, 0.8),
-                inset 0 -4px 6px rgba(0, 0, 0, 0.8);
+                inset 0 -4px 6px rgba(0, 0, 0, 0.8); */
             vertical-align: middle;
             position: relative;
         }
@@ -206,7 +262,7 @@
             width: 32px;
             height: 44px;
             font-size: 30px;
-            color: #ffcc00;
+            color: white;
             /* Gold digits for Header */
         }
 
@@ -220,8 +276,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #1a1a1a;
-            color: #ff4d4d;
+            background: #0404c7;
+            color: white;
             /* Sharp Red for Prefix */
             padding: 0 10px;
             height: 34px;
@@ -250,6 +306,22 @@
             height: 28px;
             font-size: 16px;
             padding: 0 6px;
+        }
+
+        #code-0 {
+            display: none !important;
+        }
+
+        #code-1 {
+            display: none !important;
+        }
+
+        #code-2 {
+            display: none !important;
+        }
+
+        #code-3 {
+            display: none !important;
         }
 
         @media (max-width: 900px) {
@@ -284,19 +356,31 @@
 
             .card-frame {
                 width: 290px;
-                height: 290px;
-                min-height: auto;
+                min-height: 290px;
+                height: auto;
                 padding: 6px 10px;
             }
 
             .card-img {
                 width: 100%;
-                height: 160px;
+                height: 230px;
             }
 
             .card-label {
+                top: 8px;
                 font-size: 14px;
-                padding: 5px 0;
+                padding: 4px 8px;
+                width: 90%;
+            }
+
+            .card-code {
+                bottom: 8px;
+                padding: 6px 2px !important;
+            }
+
+            .yantra-hint {
+                font-size: 20px;
+                margin-top: 8px;
             }
 
             .digit-box {
@@ -353,58 +437,91 @@
         <div class="product-card" id="card-0">
             <div class="product-title" id="title-0">Product Code :</div>
             <div class="card-frame">
-                <img class="card-img" id="img-0" src="assets/Kamala Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-0">NAVAGRAHA</div>
-                <div class="card-code" id="code-0">Product Code --</div>
+                <div class="img-container">
+                    <img class="card-img" id="img-0" src="assets/yantra.webp" alt="Yantra">
+                    <div class="card-label" id="name-0">NAVAGRAHA</div>
+                    <div class="card-code" id="code-0">Product Code --</div>
+                </div>
+                <div class="yantra-hint">To get Yantra Choose <br> Your Product Code</div>
             </div>
         </div>
 
         <div class="product-card" id="card-1">
             <div class="product-title" id="title-1">Product Code :</div>
             <div class="card-frame">
-                <img class="card-img" id="img-1" src="assets/Bhairav Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-1">RAJARANI MOHINI</div>
-                <div class="card-code" id="code-1">Product Code --</div>
+                <div class="img-container">
+                    <img class="card-img" id="img-1" src="assets/yantra1.webp" alt="Yantra">
+                    <div class="card-label" id="name-1">RAJARANI MOHINI</div>
+                    <div class="card-code" id="code-1">Product Code --</div>
+                </div>
+                <div class="yantra-hint">To get Yantra Choose <br> Your Product Code</div>
             </div>
         </div>
 
         <div class="product-card" id="card-2">
             <div class="product-title" id="title-2">Product Code :</div>
             <div class="card-frame">
-                <img class="card-img" id="img-2" src="assets/Matsya Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-2">GAYATRI YANTRA</div>
-                <div class="card-code" id="code-2">Product Code --</div>
+                <div class="img-container">
+                    <img class="card-img" id="img-2" src="assets/yantra2.webp" alt="Yantra">
+                    <div class="card-label" id="name-2">GAYATRI YANTRA</div>
+                    <div class="card-code" id="code-2">Product Code --</div>
+                </div>
+                <div class="yantra-hint">To get Yantra Choose <br> Your Product Code</div>
             </div>
         </div>
 
         <div class="product-card" id="card-3">
             <div class="product-title" id="title-3">Product Code :</div>
             <div class="card-frame">
-                <img class="card-img" id="img-3" src="assets/Ganesha Yantra.PNG" alt="Yantra">
-                <div class="card-label" id="name-3">RAJARANI HUNDRED</div>
-                <div class="card-code" id="code-3">Product Code --</div>
+                <div class="img-container">
+                    <img class="card-img" id="img-3" src="assets/yantra3.webp" alt="Yantra">
+                    <div class="card-label" id="name-3">RAJARANI HUNDRED</div>
+                    <div class="card-code" id="code-3">Product Code --</div>
+                </div>
+                <div class="yantra-hint">To get Yantra Choose <br> Your Product Code</div>
             </div>
         </div>
 
     </div>
 
     <script>
-        const allImages = [
+        // Original webp images — shown during page load and shuffle animation
+        const cardImages = [
+            'assets/yantra.webp',
+            'assets/yantra1.webp',
+            'assets/yantra2.webp',
+            'assets/yantra3.webp'
+        ];
+
+        // Pool of random images — shown AFTER rotation stops
+        const imagePool = [
+            'assets/1323BSriYantra.jpg',
             'assets/Bhairav Yantra.PNG',
             'assets/Ganesha Yantra.PNG',
             'assets/Kamala Yantra.PNG',
             'assets/Kamala Yantra2.PNG',
             'assets/Matsya Yantra.PNG',
             'assets/Yantra Kamala.PNG',
-            'assets/1323BSriYantra.jpg',
-            'assets/ohm.png',
-            'assets/Screenshot 2026-02-24 at 01-52-16 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
-            'assets/Screenshot 2026-02-24 at 01-52-39 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
-            'assets/Screenshot 2026-02-24 at 01-52-45 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
-            'assets/Screenshot 2026-02-24 at 01-53-01 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
-            'assets/Screenshot 2026-02-24 at 01-53-17 Shree Yantra Images \u2013 Browse 201 Stock Photos Vectors and Video Adobe Stock.png',
-            'assets/Screenshot 2026-02-24 at 01-53-52 Shree yantra stock photos royalty-free images vectors video.png'
+            'assets/ohm.png'
         ];
+
+        // Returns a random image from pool
+        function randomImg() {
+            return imagePool[Math.floor(Math.random() * imagePool.length)];
+        }
+
+        // Start cycling random images every 10 sec for a card (called after rotation stops)
+        const imgRotateIntervals = [null, null, null, null];
+        function startImageRotation(i) {
+            // Clear any existing rotation before starting fresh
+            if (imgRotateIntervals[i]) clearInterval(imgRotateIntervals[i]);
+            const img = document.getElementById(`img-${i}`);
+            img.src = randomImg(); // show first random image immediately
+            imgRotateIntervals[i] = setInterval(() => {
+                const img2 = document.getElementById(`img-${i}`);
+                img2.src = randomImg();
+            }, 10000);
+        }
 
         const cardState = [
             { interval: null, lastResult: null, initialized: false },
@@ -421,16 +538,6 @@
             return `${day}-${month}-${year}`;
         }
 
-        function getRandomImage() {
-            return allImages[Math.floor(Math.random() * allImages.length)];
-        }
-
-        // Helper to get 4 unique random images from the pool
-        function getUniqueImages() {
-            const shuffled = [...allImages].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, 4);
-        }
-
         function startShuffle(i, targetCode) {
             if (cardState[i].interval) return;
             const card = document.getElementById(`card-${i}`);
@@ -440,12 +547,12 @@
 
             card.classList.add('shuffling');
 
-            // 1. Image Shuffle
-            cardState[i].interval = setInterval(() => {
-                img.src = getRandomImage();
-            }, 70);
+            // Show webp image during shuffle — no rapid flashing
+            img.src = cardImages[i];
+            // Use a dummy non-null value so stopShuffle knows it's running
+            cardState[i].interval = true;
 
-            // 2. Pro Roller Logic (Petrol Meter Style)
+            // Pro Roller Logic (Petrol Meter Style) — digits only, image stays fixed
             let prefix = "NG"; // Default fallback
             if (targetCode) {
                 const match = targetCode.match(/^([A-Za-z]+)/);
@@ -456,7 +563,7 @@
                 const d1 = Math.floor(Math.random() * 10);
                 const d2 = Math.floor(Math.random() * 10);
 
-                const html = `<span class="code-prefix">${prefix}</span><span class="digit-box">${d1}</span><span class="digit-box">${d2}</span>`;
+                const html = `<div class="d-flex margin-0-5"><span class="code-prefix">${prefix}</span><span class="digit-box">${d1}</span><span class="digit-box">${d2}</span></div>`;
                 title.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
                 code.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
             }, 60);
@@ -464,10 +571,12 @@
 
         function stopShuffle(i, winCode, finalImg) {
             const state = cardState[i];
-            if (state.interval) {
+            // interval may be `true` (non-interval marker) or an actual interval ID
+            if (state.interval && state.interval !== true) {
                 clearInterval(state.interval);
-                state.interval = null;
             }
+            state.interval = null;
+
             if (state.textInterval) {
                 clearInterval(state.textInterval);
                 state.textInterval = null;
@@ -479,14 +588,15 @@
             const title = document.getElementById(`title-${i}`);
 
             card.classList.remove('shuffling');
-            img.src = finalImg || getRandomImage();
+            // Rotation stopped — now start cycling random images
+            startImageRotation(i);
 
             if (winCode) {
                 const match = winCode.match(/^([A-Za-z]+)(.*)$/);
                 if (match) {
                     const prefix = match[1];
                     const digits = match[2].split('');
-                    const html = `<span class="code-prefix">${prefix}</span>${digits.map(d => `<span class="digit-box">${d}</span>`).join('')}`;
+                    const html = `<div class="d-flex margin-0-5"><span class="code-prefix">${prefix}</span>${digits.map(d => `<span class="digit-box">${d}</span>`).join('')}</div>`;
                     title.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
                     code.innerHTML = `<span class="label-text">Product Code </span> ${html}`;
                 } else {
@@ -515,7 +625,6 @@
                 document.getElementById('currentDate').innerText = `Date : ${formatDate(d)}`;
 
                 const results = data.prev_game_results || [];
-                const batchImages = getUniqueImages();
 
                 // Header Time Logic: Show the time of the LAST PUBLISHED result
                 if (results.length > 0 && results[0].time && results[0].time !== '00:00') {
@@ -530,7 +639,7 @@
                 for (let i = 0; i < 4; i++) {
                     const state = cardState[i];
                     const r = results[i];
-                    const finalImg = batchImages[i];
+                    const finalImg = randomImg();  // random image from pool
 
                     const winCode = (r && r.win_code && r.win_code !== '--') ? r.win_code : null;
                     const resTime = (r && r.time) ? r.time : '';
@@ -551,11 +660,17 @@
                         } else {
                             state.lastSig = null;
                             startShuffle(i, currentPrefix);
+                            const ci = i;
+                            setTimeout(() => stopShuffle(ci, null, randomImg()), 10000);
                         }
                     } else {
                         if (!winCode) {
                             state.lastSig = null;
-                            if (!state.interval) startShuffle(i, currentPrefix);
+                            if (!state.interval) {
+                                startShuffle(i, currentPrefix);
+                                const ci = i;
+                                setTimeout(() => stopShuffle(ci, null, randomImg()), 10000);
+                            }
                         } else if (state.lastSig !== signature) {
                             state.lastSig = signature;
                             if (!state.interval) startShuffle(i, winCode);
