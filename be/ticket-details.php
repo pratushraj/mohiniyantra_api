@@ -10,6 +10,7 @@ $data = json_decode($input, true);
 // Support both POST (JSON) and GET for testing
 $user_id = isset($data['user_id']) ? $data['user_id'] : (isset($_GET['user_id']) ? $_GET['user_id'] : null);
 $date = isset($data['date']) ? $data['date'] : (isset($_GET['date']) ? $_GET['date'] : null);
+$time_slot_id = isset($data['time_slot_id']) ? $data['time_slot_id'] : (isset($_GET['time_slot_id']) ? $_GET['time_slot_id'] : null);
 
 if (!$user_id || !$date) {
     http_response_code(400);
@@ -17,40 +18,53 @@ if (!$user_id || !$date) {
     exit;
 }
 
+$slot_filter = $time_slot_id ? " AND time_slot_id = '$time_slot_id'" : "";
+
 // Format date to Y-m-d if it comes as d-m-Y
 if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $date)) {
     $date = date('Y-m-d', strtotime($date));
 }
 
-// 1. Fetch available results for this date (All game types including Single and Double)
+// 1. FETCH RESULTS - only game_id = 3 for footer display
 $results_map = [];
-$res_query = "SELECT time_slot_id, game_type_id, game_id, result_number FROM results WHERE result_date = '$date' AND result_number IS NOT NULL AND result_number != ''";
+$res_query = "SELECT time_slot_id, game_type_id, game_id, result_number 
+              FROM results 
+              WHERE result_date = '$date' 
+              AND result_number IS NOT NULL 
+              AND result_number != '' 
+              AND game_id = 3
+              $slot_filter";
 $res_sql = mysqli_query($conn, $res_query);
 if ($res_sql) {
     while ($r = mysqli_fetch_assoc($res_sql)) {
-        // Store by slot, type, and game for precise matching
-        $results_map[$r['time_slot_id']][$r['game_type_id']][$r['game_id']] = $r['result_number'];
+        $results_map[$r['time_slot_id']][$r['game_type_id']] = $r['result_number'];
     }
 }
 
-// 1.1 Fetch already calculated winnings from user_winnings table (Source of truth for report)
+// 2. FETCH USER WINNINGS
 $winnings_map = [];
-$win_query = "SELECT time_slot_id, game_type_id, game_id, amount FROM user_winnings WHERE user_id = '$user_id' AND winning_date = '$date'";
+$win_query = "SELECT time_slot_id, game_type_id, game_id, amount, number_won 
+              FROM user_winnings 
+              WHERE user_id = '$user_id' 
+              AND winning_date = '$date' 
+              $slot_filter";
 $win_sql = mysqli_query($conn, $win_query);
 if ($win_sql) {
     while ($w = mysqli_fetch_assoc($win_sql)) {
-        // Map winning total per batch (Slot + Type + Game)
-        $winnings_map[$w['time_slot_id']][$w['game_type_id']][$w['game_id']] = (double) $w['amount'];
+        $key = $w['time_slot_id'] . '_' . $w['game_type_id'] . '_' . $w['game_id'] . '_' . $w['number_won'];
+        $winnings_map[$key] = (double) $w['amount'];
     }
 }
 
-// 2. Fetch tickets
+// 3. FETCH TICKETS
 $sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code 
         FROM tickets t
         LEFT JOIN time_slots ts ON t.time_slot_id = ts.time_slot_id
         LEFT JOIN game_types gt ON t.game_type_id = gt.game_type_id
-        WHERE t.user_id = '$user_id' AND t.ticket_date = '$date' 
-        ORDER BY ts.time DESC, t.purchase_date DESC, t.game_id DESC";
+        WHERE t.user_id = '$user_id' 
+        AND t.ticket_date = '$date' 
+        $slot_filter
+        ORDER BY ts.time DESC, t.purchase_date DESC";
 
 $result = mysqli_query($conn, $sql);
 
@@ -68,149 +82,155 @@ while ($row = mysqli_fetch_assoc($result)) {
     $purchase_time = $row['purchase_date'];
     $gt_id = $row['game_type_id'];
     $ts_id = $row['time_slot_id'];
+    $game_id = $row['game_id'];
 
-    $batch_key = $event_code . '_' . $purchase_time . '_' . $gt_id;
+    // Create unique batch key based on time_slot, game_type, AND purchase_date
+    $batch_key = $ts_id . '_' . $gt_id . '_' . $purchase_time;
 
     if (!isset($grouped_data[$batch_key])) {
-        // We show the Double result (Game 3) for the footer display
-        $batch_double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
-
-        // Sum winnings for this batch from user_winnings table first
-        $batch_win_total = 0;
-        if (isset($winnings_map[$ts_id][$gt_id])) {
-            foreach ($winnings_map[$ts_id][$gt_id] as $game_total) {
-                $batch_win_total += $game_total;
-            }
-        }
-
-        // Use game_type_code directly from DB (fetched via LEFT JOIN game_types)
-        $gt_code = isset($row['game_type_code']) ? $row['game_type_code'] : '??';
+        $double_result = isset($results_map[$ts_id][$gt_id]) ? $results_map[$ts_id][$gt_id] : null;
 
         $grouped_data[$batch_key] = [
             'gifteventcode' => $event_code,
             'draw_time' => $draw_time,
             'purchase_date' => $purchase_time,
-            'game_type_code' => $gt_code,
+            'game_type_code' => $row['game_type_code'],
             'game_type_id' => $gt_id,
-            'winning_number' => $batch_double_res, // For footer display
-            'batch_winning_amount' => $batch_win_total, // Use total from user_winnings
-            'is_cancelled' => false,
-            'cancel_amount' => 0,
+            'time_slot_id' => $ts_id,
+            'winning_number' => $double_result,
             'tickets' => [],
-            'winnings_source' => 'table' // Mark that we initialized from table
+            'batch_points' => 0,
+            'batch_winning_amount' => 0,
+            'cancel_amount' => 0,
+            'batch_cancelled_points' => 0,
+            'is_cancelled' => false,
+            'has_cancelled_tickets' => false
         ];
     }
 
-    if ($row['status'] == 0) {
-        $grouped_data[$batch_key]['is_cancelled'] = true;
-        // Use cancelled_at if available, otherwise fallback to purchase_date
-        $grouped_data[$batch_key]['cancel_time'] = (!empty($row['cancelled_at'])) ? $row['cancelled_at'] : $row['purchase_date'];
-    }
+    // Process ticket based on game_id
+    if ($game_id == 1) {
+        // Side A - Single entry showing range
+        $display_number = $row['selected_number'] . "0-" . $row['selected_number'] . "9";
 
-    $n = $row['selected_number'];
-    $tickets_to_add = [];
-    $qty = (int) $row['qty'];
+        // Find winning amount
+        $win_amt = 0;
+        for ($i = 0; $i <= 9; $i++) {
+            $full_number = $row['selected_number'] . $i;
+            $win_key = $ts_id . '_' . $gt_id . '_' . $game_id . '_' . $full_number;
 
-    $game_id = $row['game_id'];
-    if ($game_id == 2) {
-        // Side B (Units digit) - Expanded as requested
-        $single_res = isset($results_map[$ts_id][$gt_id][2]) ? $results_map[$ts_id][$gt_id][2] : null;
-        $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
+            if (isset($winnings_map[$win_key])) {
+                $win_amt = $winnings_map[$win_key];
+                break;
+            }
+        }
 
+        $ticket_data = [
+            'number' => $display_number,
+            'qty' => (double) $row['qty'] * 10,
+            'amount' => (double) $row['amount'],
+            'rate' => (double) $row['rate'],
+            'game_id' => $game_id,
+            'status' => (int) $row['status'],
+            'selected_number' => $row['selected_number'],
+            'win_amount' => $win_amt,
+            'is_cancelled' => ($row['status'] == 0) ? true : false,
+            'cancelled_at' => $row['cancelled_at']
+        ];
+
+        // Update batch totals
+        if ($ticket_data['is_cancelled']) {
+            $grouped_data[$batch_key]['cancel_amount'] += $ticket_data['amount'];
+            $grouped_data[$batch_key]['has_cancelled_tickets'] = true;
+        } else {
+            $grouped_data[$batch_key]['batch_points'] += $ticket_data['amount'];
+            $grouped_data[$batch_key]['batch_winning_amount'] += $ticket_data['win_amount'];
+        }
+
+        $grouped_data[$batch_key]['tickets'][] = $ticket_data;
+
+    } else if ($game_id == 2) {
+        // Side B - Split into 10 individual numbers
         $part_amount = $row['amount'] / 10;
+        $qty = (double) $row['qty'];
 
         for ($i = 0; $i <= 9; $i++) {
-            $num = $i . $n;
-            $win_amt = 0;
+            $full_number = $i . $row['selected_number'];
+            $win_key = $ts_id . '_' . $gt_id . '_' . $game_id . '_' . $full_number;
 
-            $has_won = false;
-            if ($single_res !== null && (int) $single_res === (int) $n) {
-                $has_won = true;
-            } else if ($double_res !== null) {
-                $double_int = (int) $double_res;
-                if (($double_int % 10) === (int) $n) {
-                    $has_won = true;
-                }
-            }
+            $win_amt = isset($winnings_map[$win_key]) ? $winnings_map[$win_key] : 0;
 
-            if ($has_won) {
-                $win_amt = $qty * 10;
-            }
-
-            $tickets_to_add[] = [
-                'number' => $num,
-                'qty' => $row['qty'],
+            $ticket_data = [
+                'number' => $full_number,
+                'qty' => $qty,
                 'amount' => $part_amount,
-                'rate' => $row['rate'],
-                'game_id' => $row['game_id'],
-                'win_amount' => $win_amt
+                'rate' => (double) $row['rate'],
+                'game_id' => $game_id,
+                'status' => (int) $row['status'],
+                'selected_number' => $row['selected_number'],
+                'win_amount' => $win_amt,
+                'is_cancelled' => ($row['status'] == 0) ? true : false,
+                'cancelled_at' => $row['cancelled_at']
             ];
 
-            if (empty($winnings_map[$ts_id][$gt_id])) {
-                $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
+            // Update batch totals
+            if ($ticket_data['is_cancelled']) {
+                $grouped_data[$batch_key]['cancel_amount'] += $ticket_data['amount'];
+                $grouped_data[$batch_key]['has_cancelled_tickets'] = true;
+            } else {
+                $grouped_data[$batch_key]['batch_points'] += $ticket_data['amount'];
+                $grouped_data[$batch_key]['batch_winning_amount'] += $ticket_data['win_amount'];
             }
-        }
-    } else if ($game_id == 1) {
-        // Side A (Tens digit) - Normal as requested
-        $display_number = $n . "0-" . $n . "9";
-        $win_amt = 0;
-        $has_won = false;
 
-        $single_res = isset($results_map[$ts_id][$gt_id][1]) ? $results_map[$ts_id][$gt_id][1] : null;
-        $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
-
-        if ($single_res !== null && (int) $single_res === (int) $n) {
-            $has_won = true;
-        } else if ($double_res !== null) {
-            $double_int = (int) $double_res;
-            if ((int) floor($double_int / 10) === (int) $n) {
-                $has_won = true;
-            }
+            $grouped_data[$batch_key]['tickets'][] = $ticket_data;
         }
 
-        if ($has_won) {
-            $win_amt = $qty * 100;
-        }
-
-        $tickets_to_add[] = [
-            'number' => $display_number,
-            'qty' => $row['qty'] * 10,
-            'amount' => $row['amount'],
-            'rate' => $row['rate'],
-            'game_id' => $row['game_id'],
-            'win_amount' => $win_amt
-        ];
-
-        if (empty($winnings_map[$ts_id][$gt_id])) {
-            $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
-        }
     } else if ($game_id == 3) {
         // Double Game
-        $double_res = isset($results_map[$ts_id][$gt_id][3]) ? $results_map[$ts_id][$gt_id][3] : null;
-        $win_amt = 0;
-        if ($double_res !== null && (int) $double_res === (int) $n) {
-            $win_amt = $qty * 900;
-        }
+        $win_key = $ts_id . '_' . $gt_id . '_' . $game_id . '_' . $row['selected_number'];
+        $win_amt = isset($winnings_map[$win_key]) ? $winnings_map[$win_key] : 0;
 
-        $tickets_to_add[] = [
-            'number' => $n,
-            'qty' => $row['qty'],
-            'amount' => $row['amount'],
-            'rate' => $row['rate'],
-            'game_id' => $row['game_id'],
-            'win_amount' => $win_amt
+        $ticket_data = [
+            'number' => $row['selected_number'],
+            'qty' => (double) $row['qty'],
+            'amount' => (double) $row['amount'],
+            'rate' => (double) $row['rate'],
+            'game_id' => $game_id,
+            'status' => (int) $row['status'],
+            'selected_number' => $row['selected_number'],
+            'win_amount' => $win_amt,
+            'is_cancelled' => ($row['status'] == 0) ? true : false,
+            'cancelled_at' => $row['cancelled_at']
         ];
 
-        if (empty($winnings_map[$ts_id][$gt_id])) {
-            $grouped_data[$batch_key]['batch_winning_amount'] += $win_amt;
+        // Update batch totals
+        if ($ticket_data['is_cancelled']) {
+            $grouped_data[$batch_key]['cancel_amount'] += $ticket_data['amount'];
+            $grouped_data[$batch_key]['has_cancelled_tickets'] = true;
+        } else {
+            $grouped_data[$batch_key]['batch_points'] += $ticket_data['amount'];
+            $grouped_data[$batch_key]['batch_winning_amount'] += $ticket_data['win_amount'];
         }
-    }
 
-    foreach ($tickets_to_add as $t) {
-        $t['status'] = $row['status'];
-        $grouped_data[$batch_key]['tickets'][] = $t;
-        if ($row['status'] == 0) {
-            $grouped_data[$batch_key]['cancel_amount'] += $t['amount'];
+        $grouped_data[$batch_key]['tickets'][] = $ticket_data;
+    }
+}
+
+// Final processing for batch level flags and display
+foreach ($grouped_data as &$batch) {
+    // If all points are cancelled, mark whole batch as cancelled
+    // But for report.html, just ensure cancel_amount is present
+    $batch['is_cancelled'] = ($batch['cancel_amount'] > 0);
+
+    if ($batch['is_cancelled']) {
+        foreach ($batch['tickets'] as $t) {
+            if ($t['is_cancelled'] && !empty($t['cancelled_at'])) {
+                $batch['cancel_time'] = $t['cancelled_at'];
+                break;
+            }
+        }
+        if (!isset($batch['cancel_time'])) {
+            $batch['cancel_time'] = $batch['purchase_date'];
         }
     }
 }
