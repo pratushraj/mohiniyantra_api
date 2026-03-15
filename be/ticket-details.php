@@ -113,16 +113,26 @@ while ($row = mysqli_fetch_assoc($result)) {
         // Side A - Single entry showing range
         $display_number = $row['selected_number'] . "0-" . $row['selected_number'] . "9";
 
-        // Find winning amount
         $win_amt = 0;
-        for ($i = 0; $i <= 9; $i++) {
-            $full_number = $row['selected_number'] . $i;
-            $win_key = $ts_id . '_' . $gt_id . '_' . $game_id . '_' . $full_number;
-
-            if (isset($winnings_map[$win_key])) {
-                $win_amt = $winnings_map[$win_key];
-                break;
+        // Check if game_id 3 result matches one of the derived numbers
+        $double_result = isset($results_map[$ts_id][$gt_id]) ? $results_map[$ts_id][$gt_id] : null;
+        if ($double_result !== null) {
+            for ($i = 0; $i <= 9; $i++) {
+                if ($double_result === $row['selected_number'] . $i) {
+                    // Won on this part: qty * 10 * 10
+                    // But effectively rate for Side A is 100 for winning? 
+                    // Let's stick to the prompt: if number matches, qty * 100. 
+                    // Note qty returned by DB might be original qty. Wait, prompt says: 
+                    // "result mai game_id = 3 sab k liye same hai, ab uss tickket slot mai match kro ki number mil rha hai ki nhi, agar mil rha hai toh uske qty se *100 kar doh"
+                    $win_amt += ((double) $row['qty'] * 10) * 10; // Side A parts are 10. so total qty * 10 * 10 = qty * 100. Let's do qty * 100 for side A total match qty. Wait. Side A win qty is original qty? If user selected Side A '5', numbers are 50..59. If result is 55, they win qty * 100.
+                }
             }
+        }
+
+        // Correcting Side A logic according to "qty * 100" base instructions
+        $win_amt = 0;
+        if ($double_result !== null && substr($double_result, 0, 1) === $row['selected_number']) {
+            $win_amt = ((double) $row['qty'] * 10) * 10; // Because 1 qty of Side A becomes 10qty underlying
         }
 
         $ticket_data = [
@@ -153,12 +163,15 @@ while ($row = mysqli_fetch_assoc($result)) {
         // Side B - Split into 10 individual numbers
         $part_amount = $row['amount'] / 10;
         $qty = (double) $row['qty'];
+        $double_result = isset($results_map[$ts_id][$gt_id]) ? $results_map[$ts_id][$gt_id] : null;
 
         for ($i = 0; $i <= 9; $i++) {
             $full_number = $i . $row['selected_number'];
-            $win_key = $ts_id . '_' . $gt_id . '_' . $game_id . '_' . $full_number;
 
-            $win_amt = isset($winnings_map[$win_key]) ? $winnings_map[$win_key] : 0;
+            $win_amt = 0;
+            if ($double_result !== null && $double_result === $full_number) {
+                $win_amt = $qty * 100;
+            }
 
             $ticket_data = [
                 'number' => $full_number,
@@ -187,8 +200,12 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     } else if ($game_id == 3) {
         // Double Game
-        $win_key = $ts_id . '_' . $gt_id . '_' . $game_id . '_' . $row['selected_number'];
-        $win_amt = isset($winnings_map[$win_key]) ? $winnings_map[$win_key] : 0;
+        $double_result = isset($results_map[$ts_id][$gt_id]) ? $results_map[$ts_id][$gt_id] : null;
+
+        $win_amt = 0;
+        if ($double_result !== null && $double_result === $row['selected_number']) {
+            $win_amt = (double) $row['qty'] * 100;
+        }
 
         $ticket_data = [
             'number' => $row['selected_number'],
