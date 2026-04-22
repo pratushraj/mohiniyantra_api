@@ -16,9 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 // Production configuration
 $servername = "localhost"; // Database server name
-$username = "root";         // Database username
-$password = "Pratush@8804";             // Database password
-$dbname = "rajrani";  // Database name
+$username = "u547026376_gwwin";         // Database username
+$password = "32dS1CIEn@";             // Database password
+$dbname = "u547026376_gwwin";  // Database name
 
 
 // Create connection
