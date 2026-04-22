@@ -57,10 +57,10 @@ if ($win_sql) {
 }
 
 // 3. FETCH TICKETS
-$sql = "SELECT t.*, ts.time as draw_time, gt.game_type_code 
+$sql = "SELECT t.*, ts.time as draw_time, cfg.game_type_code 
         FROM tickets t
         LEFT JOIN time_slots ts ON t.time_slot_id = ts.time_slot_id
-        LEFT JOIN game_types gt ON t.game_type_id = gt.game_type_id
+        LEFT JOIN time_slot_game_config cfg ON t.time_slot_id = cfg.time_slot_id AND t.game_type_id = cfg.game_type_idx
         WHERE t.user_id = '$user_id' 
         AND t.ticket_date = '$date' 
         $slot_filter

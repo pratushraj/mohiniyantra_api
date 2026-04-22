@@ -21,16 +21,16 @@ if (!$data || !isset($data['id'])) {
 }
 $userId = $data['id'];
 $sql = mysqli_query($conn, "
-    SELECT user_id, amount, winning_date, g.game_name, gt.game_type_name, gt.game_type_code, t.time, number_won 
+    SELECT user_id, amount, winning_date, g.game_name, cfg.game_type_name, cfg.game_type_code, t.time, number_won 
     FROM user_winnings uw
     LEFT JOIN games g ON uw.game_id = g.game_id
-    LEFT JOIN game_types gt ON uw.game_type_id = gt.game_type_id
+    LEFT JOIN time_slot_game_config cfg ON uw.time_slot_id = cfg.time_slot_id AND uw.game_type_id = cfg.game_type_idx
     LEFT JOIN time_slots t ON uw.time_slot_id = t.time_slot_id
-    WHERE user_id = ".$userId."
+    WHERE user_id = " . $userId . "
     ORDER BY id DESC;
 ");
-if( mysqli_num_rows($sql) > 0 ) {
-    while( $res = mysqli_fetch_assoc($sql) ) {
+if (mysqli_num_rows($sql) > 0) {
+    while ($res = mysqli_fetch_assoc($sql)) {
         $events[] = $res;
     }
     http_response_code(200);
