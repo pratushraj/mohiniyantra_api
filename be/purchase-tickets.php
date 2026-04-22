@@ -12,8 +12,12 @@ if (isset($currentGameTimeSlotRes) && !empty($currentGameTimeSlotRes)) {
     $gameDetails['end_time'] = $currentGameTimeSlotRes['time'];
     $allowedTimeStamp = date('Y-m-d H:i:s', strtotime($gameDetails['end_time'] . ' -4 seconds'));
 } else {
-    $allowedTimeStamp = date('Y-m-d H:i:s', strtotime('08:29:56' . ' +1 day'));
+    // If all today's slots are over, fetch the first slot of the day for tomorrow's limit
+    $firstSlot = mysqli_fetch_assoc(mysqli_query($conn, "SELECT time FROM time_slots ORDER BY time ASC LIMIT 1"));
+    $firstTime = $firstSlot ? $firstSlot['time'] : '08:00:00';
+    $allowedTimeStamp = date('Y-m-d H:i:s', strtotime($firstTime . ' -4 seconds +1 day'));
 }
+
 // Current running game
 
 header("Content-Type: application/json");
